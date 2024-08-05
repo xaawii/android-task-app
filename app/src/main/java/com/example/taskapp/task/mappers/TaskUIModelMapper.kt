@@ -2,8 +2,9 @@ package com.example.taskapp.task.mappers
 
 import com.example.taskapp.task.domain.models.TaskModel
 import com.example.taskapp.task.presentation.model.TaskUIModel
+import javax.inject.Inject
 
-class TaskUIModelMapper {
+class TaskUIModelMapper @Inject constructor() {
 
     fun fromDomainToUI(taskModel: TaskModel): TaskUIModel {
         return TaskUIModel(

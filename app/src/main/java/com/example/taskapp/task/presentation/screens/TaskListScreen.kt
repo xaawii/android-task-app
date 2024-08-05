@@ -1,5 +1,6 @@
 package com.example.taskapp.task.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -21,17 +22,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,17 +59,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavHostController
+import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.components.LoadingComponent
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun TaskScreen(taskListViewModel: TaskListViewModel) {
+fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
+
+    val context = LocalContext.current
 
     LaunchedEffect(true) {
         taskListViewModel.getTasks()
+    }
+
+
+    LaunchedEffect(key1 = taskListViewModel.taskDeletedEvent) {
+        taskListViewModel.taskDeletedEvent.collectLatest {
+            if (it) {
+                Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete task", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -85,7 +110,11 @@ fun TaskScreen(taskListViewModel: TaskListViewModel) {
         }
 
         is TaskListUIState.Success -> {
-            MainBody(uiState, taskListViewModel)
+            MainBody(
+                (uiState as TaskListUIState.Success).tasks,
+                taskListViewModel,
+                navigationController
+            )
         }
     }
 
@@ -94,26 +123,61 @@ fun TaskScreen(taskListViewModel: TaskListViewModel) {
 
 @Composable
 private fun MainBody(
-    uiState: TaskListUIState,
-    taskListViewModel: TaskListViewModel
+    tasks: List<TaskUIModel>,
+    taskListViewModel: TaskListViewModel,
+    navigationController: NavHostController
 ) {
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Color.Blue)
-    ) {
-        WelcomeUserHeader()
-        CardTaskBody(uiState, taskListViewModel)
+    Scaffold(
+        topBar = { MyTopAppBar() },
+        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask.route) } },
+        floatingActionButtonPosition = FabPosition.End
+    ) { contentPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Blue)
+                .padding(contentPadding)
+
+        ) {
+            WelcomeUserHeader()
+            CardTaskBody(tasks, taskListViewModel)
+        }
 
     }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTopAppBar() {
+    TopAppBar(
+        title = { Text(text = "TaskApp") },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Blue,
+            titleContentColor = Color.White,
+            actionIconContentColor = Color.White
+        ),
+        actions = {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "options")
+            }
+        })
 
 }
 
 @Composable
+fun MyFAB(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = { onClick() },
+    ) {
+        Icon(imageVector = Icons.Filled.Add, contentDescription = "add")
+    }
+}
+
+@Composable
 private fun CardTaskBody(
-    uiState: TaskListUIState,
+    tasks: List<TaskUIModel>,
     taskListViewModel: TaskListViewModel
 ) {
     Card(
@@ -130,7 +194,7 @@ private fun CardTaskBody(
                 style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
             )
             Spacer(Modifier.height(8.dp))
-            TasksList((uiState as TaskListUIState.Success).tasks, taskListViewModel)
+            TasksList(tasks, taskListViewModel)
         }
 
     }
@@ -158,6 +222,7 @@ private fun WelcomeUserHeader() {
 private fun TasksList(tasks: List<TaskUIModel>, taskListViewModel: TaskListViewModel) {
 
     LazyColumn {
+
         items(tasks, key = { it.id }) {
             ItemTask(
                 Modifier
@@ -232,9 +297,9 @@ fun <T> SwipeToDeleteContainer(
     var isRemoved by remember {
         mutableStateOf(false)
     }
-    val state = rememberDismissState(
+    val state = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
-            if (value == DismissValue.DismissedToStart) {
+            if (value == SwipeToDismissBoxValue.EndToStart) {
                 isRemoved = true
                 true
             } else {
@@ -263,7 +328,7 @@ fun <T> SwipeToDeleteContainer(
                 DeleteBackground(swipeDismissState = state)
             },
             dismissContent = { content(item) },
-            directions = setOf(DismissDirection.EndToStart)
+            directions = setOf(SwipeToDismissBoxValue.EndToStart)
         )
     }
 }
@@ -271,9 +336,9 @@ fun <T> SwipeToDeleteContainer(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteBackground(
-    swipeDismissState: DismissState
+    swipeDismissState: SwipeToDismissBoxState
 ) {
-    val color = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) {
+    val color = if (swipeDismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
         Color.Red
     } else Color.Transparent
 

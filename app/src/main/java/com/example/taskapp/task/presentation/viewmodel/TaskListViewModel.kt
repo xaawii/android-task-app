@@ -8,8 +8,9 @@ import com.example.taskapp.task.mappers.TaskUIModelMapper
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +27,12 @@ class TaskListViewModel @Inject constructor(
 
     private var taskList: MutableList<TaskUIModel> = mutableListOf()
 
+
+    //event for task deleted
+    private val _taskDeletedEvent = MutableSharedFlow<Boolean>()
+    val taskDeletedEvent: SharedFlow<Boolean> = _taskDeletedEvent
+
+
     fun getTasks() {
         viewModelScope.launch {
             try {
@@ -41,15 +48,14 @@ class TaskListViewModel @Inject constructor(
     fun onItemRemove(taskUIModel: TaskUIModel) {
         viewModelScope.launch {
             try {
-                // _uiState.value = TaskListUIState.Loading
 
                 deleteTaskByIdUseCase(taskUIModel.id)
 
                 taskList.removeIf { it.id == taskUIModel.id }
 
-                _uiState.value = TaskListUIState.Success(taskList.toList())
+                _taskDeletedEvent.emit(true)
             } catch (e: Exception) {
-                _uiState.value = TaskListUIState.Error(e.message ?: "Unknown Error")
+                _taskDeletedEvent.emit(false)
             }
         }
     }
