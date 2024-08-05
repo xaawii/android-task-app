@@ -11,8 +11,7 @@ import javax.inject.Inject
 class TaskRepositoryImpl @Inject constructor(
     private val apiClient: TaskApiClient,
     private val taskDtoMapper: TaskDtoMapper
-) :
-    TaskRepository {
+) : TaskRepository {
     override suspend fun getAllTasksByUserId(userId: Int): List<TaskModel> {
 
         return withContext(Dispatchers.IO) {
@@ -21,7 +20,7 @@ class TaskRepositoryImpl @Inject constructor(
                 val body = response.body() ?: emptyList()
                 taskDtoMapper.fromResponseListToDomainList(body)
             } else {
-                throw Exception("Error al obtener tareas: ${response.message()}")
+                throw Exception("Error retrieving tasks: ${response.message()}")
             }
         }
 
@@ -32,8 +31,38 @@ class TaskRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val response = apiClient.deleteTaskById(taskId)
             if (!response.isSuccessful)
-                throw Exception("Error al obtener tareas: ${response.message()}")
+                throw Exception("Error deleting task: ${response.message()}")
         }
 
+    }
+
+    override suspend fun deleteTaskBatch(ids: List<Long>) {
+
+        return withContext(Dispatchers.IO) {
+            val response = apiClient.deleteTasksByIdInBatch(ids)
+            if (!response.isSuccessful)
+                throw Exception("Error deleting tasks: ${response.message()}")
+        }
+
+    }
+
+    override suspend fun createTask(taskModel: TaskModel, userId: Int) {
+        return withContext(Dispatchers.IO) {
+            val response =
+                apiClient.createTask(userId, taskDtoMapper.fromDomainToRequest(taskModel))
+
+            if (!response.isSuccessful)
+                throw Exception("Error creating task: ${response.message()}")
+        }
+    }
+
+    override suspend fun updateTask(taskModel: TaskModel) {
+        return withContext(Dispatchers.IO) {
+            val response =
+                apiClient.updateTask(taskModel.id, taskDtoMapper.fromDomainToRequest(taskModel))
+
+            if (!response.isSuccessful)
+                throw Exception("Error creating task: ${response.message()}")
+        }
     }
 }
