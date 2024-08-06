@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DropdownMenu
@@ -30,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,19 +43,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.components.LoadingComponent
-import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.AddTaskUIState
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 @Composable
 fun AddTaskScreen(navigationController: NavHostController, addTaskViewModel: AddTaskViewModel) {
 
-    LaunchedEffect(true){
-        addTaskViewModel.getTask()
+    LaunchedEffect(true) {
+        addTaskViewModel.getForm()
     }
 
 
@@ -81,10 +77,21 @@ fun AddTaskScreen(navigationController: NavHostController, addTaskViewModel: Add
         }
 
         is AddTaskUIState.Success -> {
+
+            Column(Modifier.fillMaxSize()) {
+                Text(text = (uiState as AddTaskUIState.Success).message)
+                Button(onClick = { navigationController.popBackStack() }) {
+                    Text(text = "Go Back")
+                }
+            }
+
+
+        }
+
+        is AddTaskUIState.Editing -> {
             MainBody(
-                (uiState as AddTaskUIState.Success).task,
-                addTaskViewModel,
-                navigationController
+                (uiState as AddTaskUIState.Editing),
+                addTaskViewModel
             )
         }
     }
@@ -93,18 +100,20 @@ fun AddTaskScreen(navigationController: NavHostController, addTaskViewModel: Add
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun MainBody(
-    task: TaskUIModel,
+    uiState: AddTaskUIState.Editing,
     addTaskViewModel: AddTaskViewModel,
-    navigationController: NavHostController
 ) {
-    var textTile by rememberSaveable { mutableStateOf("") }
-    var textDescription by rememberSaveable { mutableStateOf("") }
-    var selectedStatus by rememberSaveable { mutableStateOf(TaskStatus.PENDING) }
 
     val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
+
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        addTaskViewModel.onDueDateChanged(
+            datePickerState.selectedDateMillis?.let {
+                addTaskViewModel.formatMillisToDateString(it)
+            } ?: ""
+        )
+    }
+
 
     Column(
         modifier = Modifier
@@ -112,20 +121,20 @@ private fun MainBody(
             .padding(16.dp)
     ) {
         TextField(
-            value = textTile,
-            onValueChange = { textTile = it },
+            value = uiState.title,
+            onValueChange = { addTaskViewModel.onTitleChanged(it) },
             label = { Text("Title") }
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
-            value = textDescription,
-            onValueChange = { textDescription = it },
+            value = uiState.description,
+            onValueChange = { addTaskViewModel.onDescriptionChanged(it) },
             label = { Text("Description") }
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Selector de fecha
-        DatePickerDocked(datePickerState, selectedDate)
+        DatePickerDocked(datePickerState, uiState.dueDate)
         Spacer(modifier = Modifier.height(16.dp))
 
         // Spinner
@@ -136,13 +145,13 @@ private fun MainBody(
             TaskStatus.entries.forEach { taskStatus ->
                 DropdownMenuItem(
                     onClick = {
-                        selectedStatus = taskStatus
+                        addTaskViewModel.onTaskStatusChanged(taskStatus)
                     },
                     text = { Text(taskStatus.name) }
                 )
             }
         }
-        TextButton(onClick = { addTaskViewModel.createTask(textTile, textDescription, selectedDate) }) {
+        TextButton(onClick = { addTaskViewModel.createTask() }) {
             Text("Crear")
         }
     }
@@ -199,9 +208,4 @@ fun DatePickerDocked(
             }
         }
     }
-}
-
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
 }

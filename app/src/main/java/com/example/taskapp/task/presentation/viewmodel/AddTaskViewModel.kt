@@ -3,6 +3,7 @@ package com.example.taskapp.task.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskapp.core.utils.DataConverters
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.domain.usecases.CreateTaskUseCase
 import com.example.taskapp.task.mappers.TaskUIModelMapper
@@ -12,75 +13,90 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
     private val taskUIModelMapper: TaskUIModelMapper,
-    private val createTaskUseCase: CreateTaskUseCase
+    private val createTaskUseCase: CreateTaskUseCase,
+    private val dataConverters: DataConverters
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow<AddTaskUIState>(AddTaskUIState.Loading)
     val uiState: StateFlow<AddTaskUIState> = _uiState
 
-    fun getTask() {
+    fun getForm() {
         viewModelScope.launch {
 
-            val task = TaskUIModel(
-                0,
-                "",
-                "",
-                "",
-                "",
-                "",
-                TaskStatus.PENDING,
-                1,
-                false
-            )
-
-            _uiState.value = AddTaskUIState.Success(task)
+            _uiState.value = AddTaskUIState.Editing()
 
         }
     }
 
-    fun createTask(title: String, description: String, date: String) {
+    fun createTask() {
         viewModelScope.launch {
 
-            val task = TaskUIModel(
-                0,
-                title,
-                description,
-                "",
-                "",
-                formatDateForRequest(date),
-                TaskStatus.PENDING,
-                1,
-                false
-            )
+            if (_uiState.value is AddTaskUIState.Editing) {
 
-            try {
-                createTaskUseCase(taskUIModelMapper.fromUItoDomain(task))
+                val tempUIState = (_uiState.value as AddTaskUIState.Editing)
 
-            } catch (e: Exception) {
-                _uiState.value = AddTaskUIState.Error(e.message ?: "Unknown Error")
+                val task = TaskUIModel(
+                    0,
+                    tempUIState.title,
+                    tempUIState.description,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    dataConverters.formatDateStringToLocalDateTime(tempUIState.dueDate),
+                    tempUIState.taskStatus,
+                    1,
+                    false
+                )
+
+                try {
+                    _uiState.value = AddTaskUIState.Loading
+                    createTaskUseCase(taskUIModelMapper.fromUItoDomain(task))
+                    _uiState.value = AddTaskUIState.Success("Task created")
+
+                } catch (e: Exception) {
+                    _uiState.value = AddTaskUIState.Error(e.message ?: "Unknown Error")
+                }
             }
 
         }
 
+    }
 
+    fun onTitleChanged(title: String) {
+        if (_uiState.value is AddTaskUIState.Editing) {
+            _uiState.value = (_uiState.value as AddTaskUIState.Editing).copy(title = title)
+        }
+    }
+
+    fun onDescriptionChanged(description: String) {
+        if (_uiState.value is AddTaskUIState.Editing) {
+            _uiState.value =
+                (_uiState.value as AddTaskUIState.Editing).copy(description = description)
+        }
+    }
+
+    fun onDueDateChanged(dueDate: String) {
+        if (_uiState.value is AddTaskUIState.Editing) {
+            _uiState.value = (_uiState.value as AddTaskUIState.Editing).copy(dueDate = dueDate)
+        }
+    }
+
+    fun onTaskStatusChanged(taskStatus: TaskStatus) {
+        if (_uiState.value is AddTaskUIState.Editing) {
+            _uiState.value =
+                (_uiState.value as AddTaskUIState.Editing).copy(taskStatus = taskStatus)
+        }
+    }
+
+    fun formatMillisToDateString(millis: Long): String {
+        return dataConverters.convertMillisToDate(millis)
     }
 
 
 }
 
-fun formatDateForRequest(date: String): String {
-    val originalFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    val originalLocalDate = LocalDate.parse(date, originalFormatter)
-    val newFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-    val newLocalDateTime = LocalDateTime.of(originalLocalDate, LocalTime.of(15, 30))
-    return newLocalDateTime.format(newFormatter)
-}
