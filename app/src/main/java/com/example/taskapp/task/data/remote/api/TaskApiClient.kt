@@ -17,6 +17,11 @@ interface TaskApiClient {
         @Path("userId") userId: Int
     ): Response<List<TaskResponse>>
 
+    @GET("/task/{id}")
+    suspend fun getTaskById(
+        @Path("id") id: Long
+    ): Response<TaskResponse>
+
     @DELETE("/task/{id}")
     suspend fun deleteTaskById(
         @Path("id") id: Long

@@ -26,6 +26,17 @@ class TaskRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun getTaskById(taskId: Long): TaskModel {
+        return withContext(Dispatchers.IO) {
+            val response = apiClient.getTaskById(taskId)
+            if (response.isSuccessful && response.body() != null) {
+                taskDtoMapper.fromResponseToDomain(response.body()!!)
+            } else {
+                throw Exception("Error retrieving task: ${response.message()}")
+            }
+        }
+    }
+
     override suspend fun deleteTask(taskId: Long) {
 
         return withContext(Dispatchers.IO) {

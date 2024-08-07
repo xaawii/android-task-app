@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -130,7 +131,7 @@ private fun MainBody(
 
     Scaffold(
         topBar = { MyTopAppBar() },
-        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask.route) } },
+        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask.createRoute(0L)) } },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
         Column(
@@ -141,7 +142,7 @@ private fun MainBody(
 
         ) {
             WelcomeUserHeader()
-            CardTaskBody(tasks, taskListViewModel)
+            CardTaskBody(tasks, taskListViewModel, navigationController)
         }
 
     }
@@ -178,7 +179,8 @@ fun MyFAB(onClick: () -> Unit) {
 @Composable
 private fun CardTaskBody(
     tasks: List<TaskUIModel>,
-    taskListViewModel: TaskListViewModel
+    taskListViewModel: TaskListViewModel,
+    navigationController: NavHostController
 ) {
     Card(
         modifier = Modifier.fillMaxSize(),
@@ -194,7 +196,7 @@ private fun CardTaskBody(
                 style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
             )
             Spacer(Modifier.height(8.dp))
-            TasksList(tasks, taskListViewModel)
+            TasksList(tasks, taskListViewModel, navigationController)
         }
 
     }
@@ -219,13 +221,14 @@ private fun WelcomeUserHeader() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TasksList(tasks: List<TaskUIModel>, taskListViewModel: TaskListViewModel) {
+private fun TasksList(tasks: List<TaskUIModel>, taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
 
     LazyColumn {
 
         items(tasks, key = { it.id }) {
             ItemTask(
                 Modifier
+                    .clickable { navigationController.navigate(Routes.AddTask.createRoute(it.id)) }
                     .animateItemPlacement(
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioHighBouncy,

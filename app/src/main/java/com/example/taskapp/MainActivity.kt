@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.screens.AddTaskScreen
 import com.example.taskapp.task.presentation.screens.TaskScreen
@@ -48,10 +50,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable(Routes.AddTask.route) {
+                        composable(
+                            Routes.AddTask.route,
+                            arguments = listOf(navArgument("taskId") { type= NavType.LongType })
+                        ) {
                             AddTaskScreen(
                                 navigationController = navigationController,
-                                addTaskViewModel
+                                addTaskViewModel,
+                                it.arguments?.getLong("taskId") ?: 0L
                             )
                         }
 

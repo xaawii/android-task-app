@@ -7,10 +7,12 @@ sealed class AddTaskUIState {
     data class Success(val message: String) : AddTaskUIState()
     data class Error(val message: String) : AddTaskUIState()
     data class Editing(
+        val id: Long = 0,
         val title: String = "",
         val description: String = "",
         val dueDate: String = "",
         val dueTime: String = "",
-        val taskStatus: TaskStatus = TaskStatus.PENDING
+        val taskStatus: TaskStatus = TaskStatus.PENDING,
+        val mode: String = "create"
     ) : AddTaskUIState()
 }

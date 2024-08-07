@@ -16,7 +16,7 @@ class DataConverters @Inject constructor() {
     }
 
     fun formatTimeToString(hour: Int, minute: Int): String {
-        return "${hour}:${minute}"
+        return String.format("%02d:%02d", hour, minute)
     }
 
     fun formatDateStringToLocalDateTime(date: String, time: String): LocalDateTime {
@@ -29,5 +29,10 @@ class DataConverters @Inject constructor() {
 
 
         return LocalDateTime.of(localDate, localTime)
+    }
+
+    fun formatLocalDateTimeToDateTimeString(localDateTime: LocalDateTime): String {
+        val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        return dateFormatter.format(localDateTime)
     }
 }

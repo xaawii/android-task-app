@@ -31,10 +31,14 @@ import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
 
 
 @Composable
-fun AddTaskScreen(navigationController: NavHostController, addTaskViewModel: AddTaskViewModel) {
+fun AddTaskScreen(
+    navigationController: NavHostController,
+    addTaskViewModel: AddTaskViewModel,
+    taskId: Long = 0
+) {
 
     LaunchedEffect(true) {
-        addTaskViewModel.getForm()
+        if (taskId == 0L) addTaskViewModel.getEmptyForm() else addTaskViewModel.getTaskForm(taskId)
     }
 
 
@@ -62,7 +66,6 @@ fun AddTaskScreen(navigationController: NavHostController, addTaskViewModel: Add
         is AddTaskUIState.Success -> {
 
             SuccessView(uiState, navigationController)
-
 
         }
 
@@ -134,18 +137,19 @@ private fun MainBody(
         ) { addTaskViewModel.onDueTimeChanged(it.hour, it.minute) }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Spinner
-        MyDropDownMenu(
-            items = TaskStatus.entries, selectedItem = uiState.taskStatus.name, onSelected = {
-                addTaskViewModel.onTaskStatusChanged(it)
-            },
-            label = "Select task status"
-        ) {
-            it.name
+        if (uiState.mode == "update") {
+            // Spinner
+            MyDropDownMenu(
+                items = TaskStatus.entries, selectedItem = uiState.taskStatus.name, onSelected = {
+                    addTaskViewModel.onTaskStatusChanged(it)
+                },
+                label = "Select task status"
+            ) {
+                it.name
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-
-        Spacer(modifier = Modifier.height(16.dp))
         TextButton(onClick = { addTaskViewModel.createTask() }) {
             Text("Create")
         }

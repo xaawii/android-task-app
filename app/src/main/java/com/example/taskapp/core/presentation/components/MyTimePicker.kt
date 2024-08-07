@@ -1,5 +1,3 @@
-@file:JvmName("TimePickerDialogKt")
-
 package com.example.taskapp.core.presentation.components
 
 import androidx.compose.foundation.background
