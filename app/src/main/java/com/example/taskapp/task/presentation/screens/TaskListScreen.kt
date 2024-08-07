@@ -61,7 +61,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.core.routes.Routes
-import com.example.taskapp.task.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel

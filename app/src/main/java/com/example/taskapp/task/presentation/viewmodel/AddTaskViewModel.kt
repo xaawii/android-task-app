@@ -47,7 +47,10 @@ class AddTaskViewModel @Inject constructor(
                     tempUIState.description,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
-                    dataConverters.formatDateStringToLocalDateTime(tempUIState.dueDate),
+                    dataConverters.formatDateStringToLocalDateTime(
+                        tempUIState.dueDate,
+                        tempUIState.dueTime
+                    ),
                     tempUIState.taskStatus,
                     1,
                     false
@@ -86,6 +89,17 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
+    fun onDueTimeChanged(hour: Int, minute: Int) {
+        if (_uiState.value is AddTaskUIState.Editing) {
+            _uiState.value = (_uiState.value as AddTaskUIState.Editing).copy(
+                dueTime = formatTimeToString(
+                    hour,
+                    minute
+                )
+            )
+        }
+    }
+
     fun onTaskStatusChanged(taskStatus: TaskStatus) {
         if (_uiState.value is AddTaskUIState.Editing) {
             _uiState.value =
@@ -94,7 +108,11 @@ class AddTaskViewModel @Inject constructor(
     }
 
     fun formatMillisToDateString(millis: Long): String {
-        return dataConverters.convertMillisToDate(millis)
+        return dataConverters.convertMillisToDateString(millis)
+    }
+
+    private fun formatTimeToString(hour: Int, minute: Int): String {
+        return dataConverters.formatTimeToString(hour, minute)
     }
 
 

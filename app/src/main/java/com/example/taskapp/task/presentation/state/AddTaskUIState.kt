@@ -10,6 +10,7 @@ sealed class AddTaskUIState {
         val title: String = "",
         val description: String = "",
         val dueDate: String = "",
+        val dueTime: String = "",
         val taskStatus: TaskStatus = TaskStatus.PENDING
     ) : AddTaskUIState()
 }

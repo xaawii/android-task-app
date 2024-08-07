@@ -1,4 +1,4 @@
-package com.example.taskapp.task.presentation.components
+package com.example.taskapp.core.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

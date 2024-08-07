@@ -83,6 +83,9 @@ dependencies {
     //Gson independiente
     implementation("com.google.code.gson:gson:2.10.1")
 
+    //Material icons extended
+    implementation("androidx.compose.material:material-icons-extended")
+
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.activity:activity-compose:1.9.1")

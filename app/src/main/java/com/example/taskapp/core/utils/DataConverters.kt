@@ -10,14 +10,24 @@ import java.util.Locale
 import javax.inject.Inject
 
 class DataConverters @Inject constructor() {
-    fun convertMillisToDate(millis: Long): String {
+    fun convertMillisToDateString(millis: Long): String {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return formatter.format(Date(millis))
     }
 
-    fun formatDateStringToLocalDateTime(date: String): LocalDateTime {
-        val originalFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val originalLocalDate = LocalDate.parse(date, originalFormatter)
-        return LocalDateTime.of(originalLocalDate, LocalTime.of(0, 0, 0))
+    fun formatTimeToString(hour: Int, minute: Int): String {
+        return "${hour}:${minute}"
+    }
+
+    fun formatDateStringToLocalDateTime(date: String, time: String): LocalDateTime {
+        val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+
+        val localDate = LocalDate.parse(date, dateFormatter)
+        val localTime = LocalTime.parse(time, timeFormatter)
+
+
+        return LocalDateTime.of(localDate, localTime)
     }
 }
