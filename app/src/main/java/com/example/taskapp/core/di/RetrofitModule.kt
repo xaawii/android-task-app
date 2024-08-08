@@ -1,9 +1,10 @@
 package com.example.taskapp.core.di
 
 import com.example.taskapp.BuildConfig
+import com.example.taskapp.core.data.local.datastore.DataStoreManager
 import com.example.taskapp.core.utils.LocalDateTimeConverter
 import com.example.taskapp.task.data.remote.api.TaskApiClient
-import com.example.taskapp.task.data.remote.interceptors.AccessTokenInterceptor
+import com.example.taskapp.core.data.remote.interceptors.AccessTokenInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object TaskApiModule {
+object RetrofitModule {
 
     @Singleton
     @Provides
@@ -31,21 +32,15 @@ object TaskApiModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(gson: Gson): Retrofit {
+    fun provideRetrofit(gson: Gson, dataStoreManager: DataStoreManager): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(OkHttpClient().newBuilder().apply {
-                addInterceptor(AccessTokenInterceptor())
+                addInterceptor(AccessTokenInterceptor(dataStoreManager))
             }.build())
             .build()
     }
 
-
-    @Singleton
-    @Provides
-    fun provideTaskApiClient(retrofit: Retrofit): TaskApiClient {
-        return retrofit.create(TaskApiClient::class.java)
-    }
 
 }

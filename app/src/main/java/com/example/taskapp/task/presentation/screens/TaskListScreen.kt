@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -61,8 +62,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
-import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
@@ -221,7 +222,11 @@ private fun WelcomeUserHeader() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TasksList(tasks: List<TaskUIModel>, taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
+private fun TasksList(
+    tasks: List<TaskUIModel>,
+    taskListViewModel: TaskListViewModel,
+    navigationController: NavHostController
+) {
 
     LazyColumn {
 
@@ -250,7 +255,10 @@ fun ItemTask(
 ) {
     SwipeToDeleteContainer(
         item = taskModel,
-        onDelete = { taskListViewModel.onItemRemove(taskModel) }) {
+        onDelete = { taskListViewModel.onItemRemove(taskModel) },
+        paddingValues = PaddingValues(vertical = 8.dp),
+        cornerShape = RoundedCornerShape(12.dp)
+    ) {
         TaskCard(modifier = modifier, taskModel = taskModel)
     }
 }
@@ -295,6 +303,8 @@ fun <T> SwipeToDeleteContainer(
     item: T,
     onDelete: (T) -> Unit,
     animationDuration: Int = 500,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
+    cornerShape: RoundedCornerShape = RoundedCornerShape(0.dp),
     content: @Composable (T) -> Unit
 ) {
     var isRemoved by remember {
@@ -325,21 +335,28 @@ fun <T> SwipeToDeleteContainer(
             shrinkTowards = Alignment.Top
         ) + fadeOut()
     ) {
-        SwipeToDismiss(
+        SwipeToDismissBox(
             state = state,
-            background = {
-                DeleteBackground(swipeDismissState = state)
+            backgroundContent = {
+                DeleteBackground(
+                    swipeDismissState = state,
+                    paddingValues = paddingValues,
+                    cornerShape = cornerShape
+                )
             },
-            dismissContent = { content(item) },
-            directions = setOf(SwipeToDismissBoxValue.EndToStart)
+            content = { content(item) },
+            enableDismissFromEndToStart = true
         )
+
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteBackground(
-    swipeDismissState: SwipeToDismissBoxState
+    swipeDismissState: SwipeToDismissBoxState,
+    paddingValues: PaddingValues,
+    cornerShape: RoundedCornerShape
 ) {
     val color = if (swipeDismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
         Color.Red
@@ -348,11 +365,13 @@ fun DeleteBackground(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color)
-            .padding(16.dp),
+            .padding(paddingValues)
+            .clip(cornerShape)
+            .background(color),
         contentAlignment = Alignment.CenterEnd
     ) {
         Icon(
+            modifier = Modifier.padding(6.dp),
             imageVector = Icons.Default.Delete,
             contentDescription = null,
             tint = Color.White

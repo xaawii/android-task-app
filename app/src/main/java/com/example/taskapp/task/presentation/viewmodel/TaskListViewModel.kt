@@ -53,6 +53,8 @@ class TaskListViewModel @Inject constructor(
 
                 taskList.removeIf { it.id == taskUIModel.id }
 
+                _uiState.value = TaskListUIState.Success(taskList.toList())
+
                 _taskDeletedEvent.emit(true)
             } catch (e: Exception) {
                 _taskDeletedEvent.emit(false)
