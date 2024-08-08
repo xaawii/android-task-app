@@ -106,7 +106,7 @@ private fun MainBody(
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = uiState.title,
-            onValueChange = { addTaskViewModel.onTitleChanged(it) },
+            onValueChange = addTaskViewModel::onTitleChanged,
             label = { Text("Title") },
             maxLines = 1
         )
@@ -116,7 +116,7 @@ private fun MainBody(
                 .fillMaxWidth()
                 .height(50.dp),
             value = uiState.description,
-            onValueChange = { addTaskViewModel.onDescriptionChanged(it) },
+            onValueChange = addTaskViewModel::onDescriptionChanged,
             label = { Text("Description") }
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -140,9 +140,9 @@ private fun MainBody(
         if (uiState.mode == "update") {
             // Spinner
             MyDropDownMenu(
-                items = TaskStatus.entries, selectedItem = uiState.taskStatus.name, onSelected = {
-                    addTaskViewModel.onTaskStatusChanged(it)
-                },
+                items = TaskStatus.entries,
+                selectedItem = uiState.taskStatus.name,
+                onSelected = addTaskViewModel::onTaskStatusChanged,
                 label = "Select task status"
             ) {
                 it.name
@@ -150,7 +150,7 @@ private fun MainBody(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        TextButton(onClick = { addTaskViewModel.createTask() }) {
+        TextButton(onClick = addTaskViewModel::createTask) {
             Text("Create")
         }
     }

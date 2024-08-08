@@ -61,6 +61,10 @@ dependencies {
     val retrofitVersion = "2.9.0"
     val navVersion = "2.7.7"
 
+
+    //DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     //Navigation
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
@@ -69,7 +73,6 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     ksp("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0")
-
 
     //DaggerHilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
