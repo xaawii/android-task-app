@@ -13,6 +13,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.taskapp.auth.presentation.screens.InitScreen
+import com.example.taskapp.auth.presentation.screens.LoginScreen
+import com.example.taskapp.auth.presentation.viewmodel.InitViewModel
+import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.screens.AddTaskScreen
 import com.example.taskapp.task.presentation.screens.TaskScreen
@@ -24,6 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val initViewModel: InitViewModel by viewModels()
+    private val loginViewModel: LoginViewModel by viewModels()
     private val taskListViewModel: TaskListViewModel by viewModels()
     private val addTaskViewModel: AddTaskViewModel by viewModels()
 
@@ -38,10 +44,22 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     val navigationController = rememberNavController()
+
                     NavHost(
                         navController = navigationController,
-                        startDestination = Routes.TasksListScreen.route
+                        startDestination = Routes.InitScreen.route
                     ) {
+
+                        composable(Routes.InitScreen.route) {
+                            InitScreen(
+                                initViewModel = initViewModel,
+                                navigationController = navigationController
+                            )
+                        }
+
+                        composable(Routes.LoginScreen.route) {
+                            LoginScreen(loginViewModel, navigationController)
+                        }
 
                         composable(Routes.TasksListScreen.route) {
                             TaskScreen(
@@ -52,7 +70,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(
                             Routes.AddTask.route,
-                            arguments = listOf(navArgument("taskId") { type= NavType.LongType })
+                            arguments = listOf(navArgument("taskId") { type = NavType.LongType })
                         ) {
                             AddTaskScreen(
                                 navigationController = navigationController,
