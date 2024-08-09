@@ -36,8 +36,8 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    LaunchedEffect(key1 = registerViewModel.registerErrorEvent) {
-        registerViewModel.registerErrorEvent.collectLatest {
+    LaunchedEffect(key1 = registerViewModel.emailErrorEvent) {
+        registerViewModel.emailErrorEvent.collectLatest {
             if (it) {
                 Toast.makeText(context, "Email already in use", Toast.LENGTH_SHORT).show()
             } else {

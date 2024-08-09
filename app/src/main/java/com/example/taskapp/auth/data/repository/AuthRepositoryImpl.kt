@@ -1,5 +1,6 @@
 package com.example.taskapp.auth.data.repository
 
+import com.example.taskapp.auth.data.exceptions.EmailAlreadyInUseException
 import com.example.taskapp.auth.data.remote.api.AuthApiClient
 import com.example.taskapp.auth.data.remote.dto.TokenDto
 import com.example.taskapp.auth.domain.repository.AuthRepository
@@ -19,7 +20,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(userModel: UserModel) {
         return withContext(Dispatchers.IO) {
             try {
-                val response = authApiClient.register(authDtoMapper.fromDomainToRegisterRequest(userModel))
+                val response =
+                    authApiClient.register(authDtoMapper.fromDomainToRegisterRequest(userModel))
                 handleResponse(response)
             } catch (e: HttpException) {
                 val errorMessage = e.response()?.errorBody()?.string() ?: e.message()
@@ -35,8 +37,10 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(userModel: UserModel): TokenDto {
         return withContext(Dispatchers.IO) {
             try {
-                val response = authApiClient.login(authDtoMapper.fromDomainToLoginRequest(userModel))
-                handleResponse(response) ?: throw Exception("Error attempting login: No response body found")
+                val response =
+                    authApiClient.login(authDtoMapper.fromDomainToLoginRequest(userModel))
+                handleResponse(response)
+                    ?: throw Exception("Error attempting login: No response body found")
             } catch (e: HttpException) {
                 val errorMessage = e.response()?.errorBody()?.string() ?: e.message()
                 throw Exception("HTTP error: $errorMessage")
@@ -53,7 +57,12 @@ class AuthRepositoryImpl @Inject constructor(
             return response.body()
         } else {
             val errorMessage = response.errorBody()?.string()
-            throw Exception("Error: $errorMessage")
+            if (errorMessage?.contains("already in use") == true) {
+                throw EmailAlreadyInUseException()
+            } else {
+                throw Exception("Error: $errorMessage")
+            }
+
         }
     }
 }

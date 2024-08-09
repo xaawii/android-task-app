@@ -36,8 +36,8 @@ class TaskListViewModel @Inject constructor(
     fun getTasks() {
         viewModelScope.launch {
             try {
-                val tasks = taskUIModelMapper.fromDomainListToUIList(getAllTasksByUserIdUseCase(1))
-                taskList = tasks.toMutableList();
+                val tasks = taskUIModelMapper.fromDomainListToUIList(getAllTasksByUserIdUseCase())
+                taskList = tasks.toMutableList()
                 _uiState.value = TaskListUIState.Success(taskList.toList())
             } catch (e: Exception) {
                 _uiState.value = TaskListUIState.Error(e.message ?: "Unknown Error")

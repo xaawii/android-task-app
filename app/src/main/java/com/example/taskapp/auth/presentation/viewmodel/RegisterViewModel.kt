@@ -2,6 +2,7 @@ package com.example.taskapp.auth.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskapp.auth.data.exceptions.EmailAlreadyInUseException
 import com.example.taskapp.auth.domain.usecases.RegisterUseCase
 import com.example.taskapp.auth.presentation.state.RegisterUIState
 import com.example.taskapp.core.domain.model.UserModel
@@ -20,8 +21,8 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
     val uiState: StateFlow<RegisterUIState> = _uiState
 
     //event for error on register
-    private val _registerErrorEvent = MutableSharedFlow<Boolean>()
-    val registerErrorEvent: SharedFlow<Boolean> = _registerErrorEvent
+    private val _emailErrorEvent = MutableSharedFlow<Boolean>()
+    val emailErrorEvent: SharedFlow<Boolean> = _emailErrorEvent
 
     fun register() {
         viewModelScope.launch {
@@ -45,14 +46,16 @@ class RegisterViewModel @Inject constructor(private val registerUseCase: Registe
 
                     _uiState.value = RegisterUIState.Success
 
-                } catch (e: Exception) {
-                    if (e.message!!.contains("already in use")) {
-                        _registerErrorEvent.emit(true)
-                    } else {
-                        _registerErrorEvent.emit(false)
-                    }
+                } catch (e: EmailAlreadyInUseException) {
 
+                    _emailErrorEvent.emit(true)
                     _uiState.value = RegisterUIState.Editing()
+
+                } catch (e: Exception) {
+
+                    _emailErrorEvent.emit(false)
+                    _uiState.value = RegisterUIState.Editing()
+
                 }
 
             }
