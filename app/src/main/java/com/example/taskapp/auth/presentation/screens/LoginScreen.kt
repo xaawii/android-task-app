@@ -41,7 +41,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
 
     when (uiState) {
         is LoginUIState.Editing -> {
-            MainBody(uiState as LoginUIState.Editing, loginViewModel)
+            MainBody(uiState as LoginUIState.Editing, loginViewModel, navigationController)
         }
 
         is LoginUIState.Error -> {
@@ -59,7 +59,11 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
 }
 
 @Composable
-private fun MainBody(uiState: LoginUIState.Editing, loginViewModel: LoginViewModel) {
+private fun MainBody(
+    uiState: LoginUIState.Editing,
+    loginViewModel: LoginViewModel,
+    navigationController: NavHostController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,8 +87,14 @@ private fun MainBody(uiState: LoginUIState.Editing, loginViewModel: LoginViewMod
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = { loginViewModel.login(uiState.email, uiState.password) }) {
-            Text(text = "Login")
+        TextButton(onClick = loginViewModel::login) {
+            Text(text = "Sign In")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = { navigationController.navigate(Routes.RegisterScreen.route) }) {
+            Text(text = "Don't have an account? Sign Up")
         }
     }
 }

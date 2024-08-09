@@ -17,26 +17,32 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
     private var _uiState = MutableStateFlow<LoginUIState>(LoginUIState.Editing())
     val uiState: StateFlow<LoginUIState> = _uiState
 
-    fun login(email: String, password: String) {
+    fun login() {
         viewModelScope.launch {
 
-            _uiState.value = LoginUIState.Loading
+            if (_uiState.value == LoginUIState.Editing()) {
 
-            try {
-                val user = UserModel(
-                    id = 0,
-                    email = email,
-                    name = "",
-                    password = password,
-                    role = ""
-                )
+                val uiStateTemporal = _uiState.value as LoginUIState.Editing
 
-                loginUseCase(user)
+                _uiState.value = LoginUIState.Loading
 
-                _uiState.value = LoginUIState.Success
+                try {
+                    val user = UserModel(
+                        id = 0,
+                        email = uiStateTemporal.email,
+                        name = "",
+                        password = uiStateTemporal.password,
+                        role = ""
+                    )
 
-            } catch (e: Exception) {
-                _uiState.value = LoginUIState.Error("Error: ${e.message}")
+                    loginUseCase(user)
+
+                    _uiState.value = LoginUIState.Success
+
+                } catch (e: Exception) {
+                    _uiState.value = LoginUIState.Error("Error: ${e.message}")
+                }
+
             }
         }
     }

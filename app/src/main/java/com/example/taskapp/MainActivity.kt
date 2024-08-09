@@ -15,8 +15,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.taskapp.auth.presentation.screens.InitScreen
 import com.example.taskapp.auth.presentation.screens.LoginScreen
+import com.example.taskapp.auth.presentation.screens.RegisterScreen
 import com.example.taskapp.auth.presentation.viewmodel.InitViewModel
 import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
+import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.screens.AddTaskScreen
 import com.example.taskapp.task.presentation.screens.TaskScreen
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
     private val loginViewModel: LoginViewModel by viewModels()
     private val taskListViewModel: TaskListViewModel by viewModels()
     private val addTaskViewModel: AddTaskViewModel by viewModels()
+    private val registerViewModel: RegisterViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +62,10 @@ class MainActivity : ComponentActivity() {
 
                         composable(Routes.LoginScreen.route) {
                             LoginScreen(loginViewModel, navigationController)
+                        }
+
+                        composable(Routes.RegisterScreen.route) {
+                            RegisterScreen(registerViewModel, navigationController)
                         }
 
                         composable(Routes.TasksListScreen.route) {
