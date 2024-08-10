@@ -36,13 +36,11 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    LaunchedEffect(key1 = registerViewModel.emailErrorEvent) {
-        registerViewModel.emailErrorEvent.collectLatest {
-            if (it) {
-                Toast.makeText(context, "Email already in use", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Failed to create account", Toast.LENGTH_SHORT).show()
-            }
+    LaunchedEffect(key1 = registerViewModel.errorEvent) {
+        registerViewModel.errorEvent.collectLatest {
+
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+
         }
     }
 
@@ -94,6 +92,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
             maxLines = 1,
             singleLine = true
         )
+        if (uiState.emailError.isNotBlank()) Text(text = uiState.emailError)
         Spacer(modifier = Modifier.height(16.dp))
 
         //name
@@ -105,6 +104,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
             maxLines = 1,
             singleLine = true
         )
+        if (uiState.nameError.isNotBlank()) Text(text = uiState.nameError)
         Spacer(modifier = Modifier.height(16.dp))
 
         //password
@@ -113,6 +113,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
             label = "Password",
             onValueChange = registerViewModel::onPasswordChanged
         )
+        if (uiState.passwordError.isNotBlank()) Text(text = uiState.passwordError)
         Spacer(modifier = Modifier.height(16.dp))
 
         //confirm password
@@ -121,6 +122,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
             label = "Confirm password",
             onValueChange = registerViewModel::onConfirmPasswordChanged
         )
+        if (!uiState.passwordMatch) Text(text = "Password doesn't match")
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = registerViewModel::register, enabled = uiState.formIsValid) {

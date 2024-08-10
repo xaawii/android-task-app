@@ -1,5 +1,6 @@
 package com.example.taskapp.auth.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,9 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -22,9 +25,18 @@ import com.example.taskapp.auth.presentation.state.LoginUIState
 import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.routes.Routes
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostController) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = loginViewModel.loginErrorEvent) {
+        loginViewModel.loginErrorEvent.collectLatest {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle

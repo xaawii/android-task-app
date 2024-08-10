@@ -9,6 +9,13 @@ sealed class RegisterUIState {
         val password: String = "",
         val confirmPassword: String = "",
         val passwordMatch: Boolean = false,
+        val emailIsValid: Boolean = false,
+        val nameIsValid: Boolean = false,
+        val passwordIsValid: Boolean = false,
+        val emailError: String = "",
+        val nameError: String = "",
+        val passwordError: String = "",
+        val matchError: String = "",
         val formIsValid: Boolean = false
     ) : RegisterUIState()
 
