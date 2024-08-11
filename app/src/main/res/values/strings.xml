@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">TaskApp</string>
+    <string name="the_request_timed_out">The request timed out</string>
+    <string name="youve_hit_your_rate_limit">You\'ve hit your rate limit</string>
+    <string name="no_internet">No internet</string>
+    <string name="file_too_large">File too large</string>
+    <string name="server_error">Server error</string>
+    <string name="error_serialization">Error serialization</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="error_disk_full">Error: Disk full</string>
+    <string name="error_bad_request">Error: Bad Request</string>
+    <string name="error_not_found">Error: Not Found</string>
+    <string name="error_forbidden">Error: Forbidden</string>
+    <string name="error_unauthorized">Error: Unauthorized</string>
 </resources>

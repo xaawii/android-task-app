@@ -2,7 +2,7 @@ package com.example.taskapp.core.domain.validator
 
 import javax.inject.Inject
 
-class UserDataValidator @Inject constructor(){
+class UserDataValidator @Inject constructor() {
 
 
     fun validatePassword(password: String): Result<Unit, PasswordError> {
@@ -15,6 +15,14 @@ class UserDataValidator @Inject constructor(){
         val hasDigit = password.any { it.isDigit() }
         if (!hasDigit) return Result.Error(PasswordError.NO_DIGIT)
 
+        return Result.Success(Unit)
+    }
+
+    fun validatePasswordMatches(
+        password: String,
+        confirmPassword: String
+    ): Result<Unit, PasswordError> {
+        if (password != confirmPassword) return Result.Error(PasswordError.NO_MATCHES)
         return Result.Success(Unit)
     }
 
@@ -32,7 +40,8 @@ class UserDataValidator @Inject constructor(){
     enum class PasswordError : Error {
         TOO_SHORT,
         NO_UPPERCASE,
-        NO_DIGIT
+        NO_DIGIT,
+        NO_MATCHES
     }
 
     enum class EmailError : Error {

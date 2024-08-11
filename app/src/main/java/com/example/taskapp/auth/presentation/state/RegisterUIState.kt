@@ -2,7 +2,6 @@ package com.example.taskapp.auth.presentation.state
 
 sealed class RegisterUIState {
     data object Loading : RegisterUIState()
-    data object Success : RegisterUIState()
     data class Editing(
         val email: String = "",
         val name: String = "",
@@ -15,7 +14,6 @@ sealed class RegisterUIState {
         val emailError: String = "",
         val nameError: String = "",
         val passwordError: String = "",
-        val matchError: String = "",
         val formIsValid: Boolean = false
     ) : RegisterUIState()
 

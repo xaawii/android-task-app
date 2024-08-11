@@ -36,11 +36,18 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    LaunchedEffect(key1 = registerViewModel.errorEvent) {
+
+    LaunchedEffect(Unit) {
         registerViewModel.errorEvent.collectLatest {
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
+        }
+    }
 
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-
+    LaunchedEffect(Unit) {
+        registerViewModel.registeredEvent.collectLatest {
+            Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
+            navigationController.popBackStack()
+            registerViewModel.resetState()
         }
     }
 
@@ -65,11 +72,6 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
         RegisterUIState.Loading -> {
             LoadingComponent()
-        }
-
-        RegisterUIState.Success -> {
-            Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
-            navigationController.popBackStack()
         }
     }
 }
@@ -122,7 +124,6 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
             label = "Confirm password",
             onValueChange = registerViewModel::onConfirmPasswordChanged
         )
-        if (!uiState.passwordMatch) Text(text = "Password doesn't match")
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = registerViewModel::register, enabled = uiState.formIsValid) {

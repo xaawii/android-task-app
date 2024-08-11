@@ -28,7 +28,8 @@ class AuthRepositoryImpl @Inject constructor(
                 } else {
                     when (response.code()) {
                         400 -> Result.Error(DataError.Network.BAD_REQUEST)
-                        403 -> Result.Error(DataError.Network.UNAUTHORIZED)
+                        401 -> Result.Error(DataError.Network.UNAUTHORIZED)
+                        403 -> Result.Error(DataError.Network.FORBIDDEN)
                         408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
                         else -> Result.Error(DataError.Network.UNKNOWN)
                     }
@@ -50,9 +51,16 @@ class AuthRepositoryImpl @Inject constructor(
                 if (response.isSuccessful) {
                     Result.Success(response.body()!!)
                 } else {
+                    println(
+                        "Error: ${response.message()}, ${response.code()}, ${
+                            response.errorBody()?.string()
+                        }"
+                    )
                     when (response.code()) {
                         400 -> Result.Error(DataError.Network.BAD_REQUEST)
-                        403 -> Result.Error(DataError.Network.UNAUTHORIZED)
+                        401 -> Result.Error(DataError.Network.UNAUTHORIZED)
+                        403 -> Result.Error(DataError.Network.FORBIDDEN)
+                        404 -> Result.Error(DataError.Network.NOT_FOUND)
                         408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
                         else -> Result.Error(DataError.Network.UNKNOWN)
                     }

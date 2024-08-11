@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.taskapp.auth.domain.usecases.DeleteUserDataFromPreferencesUseCase
 import com.example.taskapp.auth.domain.usecases.GetUserTokenUseCase
 import com.example.taskapp.auth.presentation.state.InitUIState
-import com.example.taskapp.core.data.exceptions.InvalidTokenException
 import com.example.taskapp.core.domain.usecases.ValidateTokenUseCase
+import com.example.taskapp.core.domain.validator.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,18 +29,21 @@ class InitViewModel @Inject constructor(
             val token = getUserTokenUseCase.invoke()
             if (token.isNullOrBlank()) _uiState.value = InitUIState.Unauthenticated
             else
-                try {
-                    validateTokenUseCase(token)
-                    _uiState.value = InitUIState.Authenticated
-                } catch (e: InvalidTokenException) {
-                    _uiState.value = InitUIState.Unauthenticated
+
+                when (validateTokenUseCase(token)) {
+                    is Result.Error -> {
+                        removeUserData()
+                        _uiState.value = InitUIState.Unauthenticated
+                    }
+
+                    is Result.Success -> _uiState.value = InitUIState.Authenticated
                 }
 
 
         }
     }
 
-    fun removeUserData() {
+    private fun removeUserData() {
         viewModelScope.launch {
             deleteUserDataFromPreferencesUseCase.invoke()
         }

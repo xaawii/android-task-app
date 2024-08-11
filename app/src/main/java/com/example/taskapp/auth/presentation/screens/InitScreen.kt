@@ -49,7 +49,6 @@ fun InitScreen(initViewModel: InitViewModel, navigationController: NavHostContro
         }
 
         InitUIState.Unauthenticated -> {
-            initViewModel.removeUserData()
             navigationController.navigate(Routes.LoginScreen.route)
         }
     }

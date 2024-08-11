@@ -9,6 +9,8 @@ sealed interface DataError : Error {
         SERVER_ERROR,
         SERIALIZATION,
         BAD_REQUEST,
+        NOT_FOUND,
+        FORBIDDEN,
         UNAUTHORIZED,
         UNKNOWN
     }

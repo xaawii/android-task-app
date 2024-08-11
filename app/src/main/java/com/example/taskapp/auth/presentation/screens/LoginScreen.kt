@@ -34,7 +34,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
 
     LaunchedEffect(key1 = loginViewModel.loginErrorEvent) {
         loginViewModel.loginErrorEvent.collectLatest {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -66,6 +66,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
 
         LoginUIState.Success -> {
             navigationController.navigate(Routes.TasksListScreen.route)
+            loginViewModel.resetState()
         }
     }
 }
@@ -99,13 +100,16 @@ private fun MainBody(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = loginViewModel::login) {
+        TextButton(onClick = loginViewModel::login,
+            enabled = uiState.formIsValid) {
             Text(text = "Sign In")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = { navigationController.navigate(Routes.RegisterScreen.route) }) {
+        TextButton(
+            onClick = { navigationController.navigate(Routes.RegisterScreen.route) }
+        ) {
             Text(text = "Don't have an account? Sign Up")
         }
     }

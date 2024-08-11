@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.taskapp.auth.domain.usecases.RegisterUseCase
 import com.example.taskapp.auth.presentation.state.RegisterUIState
 import com.example.taskapp.core.domain.model.UserModel
-import com.example.taskapp.core.domain.validator.DataError
 import com.example.taskapp.core.domain.validator.Result
 import com.example.taskapp.core.domain.validator.UserDataValidator
+import com.example.taskapp.core.presentation.utils.UiText
+import com.example.taskapp.core.presentation.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,14 @@ class RegisterViewModel @Inject constructor(
     private var _uiState = MutableStateFlow<RegisterUIState>(RegisterUIState.Editing())
     val uiState: StateFlow<RegisterUIState> = _uiState
 
-    private val _errorEvent = MutableSharedFlow<String>()
-    val errorEvent: SharedFlow<String> = _errorEvent
+    //error event
+    private val _errorEvent = MutableSharedFlow<UiText>()
+    val errorEvent: SharedFlow<UiText> = _errorEvent
+
+    //registered event
+    private val _registeredEvent = MutableSharedFlow<Unit>()
+    val registeredEvent: SharedFlow<Unit> = _registeredEvent
+
 
     fun register() {
         viewModelScope.launch {
@@ -41,27 +48,15 @@ class RegisterViewModel @Inject constructor(
                 )
 
                 when (val result = registerUseCase(user)) {
-                    is Result.Error -> handleRegisterError(result.error)
-                    is Result.Success -> _uiState.value = RegisterUIState.Success
+                    is Result.Error -> emitError(result.error.asUiText())
+                    is Result.Success -> _registeredEvent.emit(Unit)
                 }
             }
         }
     }
 
-    private suspend fun handleRegisterError(error: DataError) {
-        val message = when (error) {
-            DataError.Network.REQUEST_TIMEOUT -> "Request timeout"
-            DataError.Network.TOO_MANY_REQUESTS -> "Too many requests"
-            DataError.Network.NO_INTERNET -> "No internet"
-            DataError.Network.SERVER_ERROR -> "Server error"
-            DataError.Network.BAD_REQUEST -> "Email already in use"
-            DataError.Network.UNAUTHORIZED -> "Unauthorized"
-            else -> "Unknown error"
-        }
-        emitError(message)
-    }
 
-    private suspend fun emitError(text: String) {
+    private suspend fun emitError(text: UiText) {
         _errorEvent.emit(text)
         _uiState.value = RegisterUIState.Editing()
     }
@@ -87,7 +82,7 @@ class RegisterViewModel @Inject constructor(
     fun onPasswordChanged(password: String) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(password = password)
-            checkPasswordMatch()
+            validatePasswordMatches(password, confirmPassword)
             validatePassword(password)
             checkFormIsValid()
         }
@@ -96,7 +91,8 @@ class RegisterViewModel @Inject constructor(
     fun onConfirmPasswordChanged(confirmPassword: String) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(confirmPassword = confirmPassword)
-            checkPasswordMatch()
+
+            validatePasswordMatches(password, confirmPassword)
             checkFormIsValid()
         }
     }
@@ -111,11 +107,22 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    private fun validatePasswordMatches(password: String, confirmPassword: String) {
+        when (val result = userDataValidator.validatePasswordMatches(password, confirmPassword)) {
+            is Result.Error -> handlePasswordError(result.error)
+            is Result.Success -> {
+                changePasswordErrorMessage("")
+                changePasswordIsValid(true)
+            }
+        }
+    }
+
     private fun handlePasswordError(error: UserDataValidator.PasswordError) {
         val message = when (error) {
             UserDataValidator.PasswordError.TOO_SHORT -> "Min 6 characters"
             UserDataValidator.PasswordError.NO_UPPERCASE -> "Needs at least one uppercase"
             UserDataValidator.PasswordError.NO_DIGIT -> "Needs at least one digit"
+            UserDataValidator.PasswordError.NO_MATCHES -> "Confirm password don't match"
         }
         changePasswordErrorMessage(message)
         changePasswordIsValid(false)
@@ -192,16 +199,14 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun checkPasswordMatch() {
-        (_uiState.value as? RegisterUIState.Editing)?.apply {
-            _uiState.value = copy(passwordMatch = password == confirmPassword)
-        }
-    }
-
     private fun checkFormIsValid() {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             val formValid = emailIsValid && nameIsValid && passwordIsValid && passwordMatch
             _uiState.value = copy(formIsValid = formValid)
         }
+    }
+
+    fun resetState() {
+        _uiState.value = RegisterUIState.Editing()
     }
 }
