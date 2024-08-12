@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -37,6 +38,8 @@ fun AddTaskScreen(
     taskId: Long = 0
 ) {
 
+    val context = LocalContext.current
+
     LaunchedEffect(true) {
         if (taskId == 0L) addTaskViewModel.getEmptyForm() else addTaskViewModel.getTaskForm(taskId)
     }
@@ -56,7 +59,7 @@ fun AddTaskScreen(
 
     when (uiState) {
         is AddTaskUIState.Error -> {
-            Text("Error: ${(uiState as AddTaskUIState.Error).message}")
+            Text("Error: ${(uiState as AddTaskUIState.Error).message.asString(context)}")
         }
 
         AddTaskUIState.Loading -> {
@@ -150,7 +153,7 @@ private fun MainBody(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        TextButton(onClick = addTaskViewModel::createTask) {
+        TextButton(onClick = addTaskViewModel::onButtonPressed, enabled = uiState.formIsValid) {
             Text("Create")
         }
     }

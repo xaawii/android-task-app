@@ -104,7 +104,7 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
 
     when (uiState) {
         is TaskListUIState.Error -> {
-            Text("Error: ${(uiState as TaskListUIState.Error).message}")
+            Text("Error: ${(uiState as TaskListUIState.Error).message.asString(context)}")
         }
 
         TaskListUIState.Loading -> {

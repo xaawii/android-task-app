@@ -2,6 +2,8 @@ package com.example.taskapp.task.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskapp.core.domain.validator.Result
+import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
 import com.example.taskapp.task.domain.usecases.GetAllTasksByUserIdUseCase
 import com.example.taskapp.task.mappers.TaskUIModelMapper
@@ -35,30 +37,34 @@ class TaskListViewModel @Inject constructor(
 
     fun getTasks() {
         viewModelScope.launch {
-            try {
-                val tasks = taskUIModelMapper.fromDomainListToUIList(getAllTasksByUserIdUseCase())
-                taskList = tasks.toMutableList()
-                _uiState.value = TaskListUIState.Success(taskList.toList())
-            } catch (e: Exception) {
-                _uiState.value = TaskListUIState.Error(e.message ?: "Unknown Error")
+
+            when (val result = getAllTasksByUserIdUseCase()) {
+                is Result.Error -> _uiState.value =
+                    TaskListUIState.Error(result.error.asUiText())
+
+                is Result.Success -> {
+                    taskList =
+                        taskUIModelMapper.fromDomainListToUIList(result.data).toMutableList()
+                    _uiState.value = TaskListUIState.Success(taskList.toList())
+                }
             }
+
         }
     }
 
     fun onItemRemove(taskUIModel: TaskUIModel) {
         viewModelScope.launch {
-            try {
 
-                deleteTaskByIdUseCase(taskUIModel.id)
-
-                taskList.removeIf { it.id == taskUIModel.id }
-
-                _uiState.value = TaskListUIState.Success(taskList.toList())
-
-                _taskDeletedEvent.emit(true)
-            } catch (e: Exception) {
-                _taskDeletedEvent.emit(false)
+            when (deleteTaskByIdUseCase(taskUIModel.id)) {
+                is Result.Error -> _taskDeletedEvent.emit(false)
+                is Result.Success -> {
+                    taskList.removeIf { it.id == taskUIModel.id }
+                    _uiState.value = TaskListUIState.Success(taskList.toList())
+                    _taskDeletedEvent.emit(true)
+                }
             }
         }
+
     }
+
 }
