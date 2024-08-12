@@ -1,5 +1,6 @@
 package com.example.taskapp.core.presentation.utils
 
+
 import com.example.taskapp.R
 import com.example.taskapp.core.domain.validator.DataError
 import com.example.taskapp.core.domain.validator.Result
@@ -41,12 +42,15 @@ fun DataError.asUiText(): UiText {
         DataError.Network.BAD_REQUEST -> UiText.StringResource(
             R.string.error_bad_request
         )
+
         DataError.Network.NOT_FOUND -> UiText.StringResource(
             R.string.error_not_found
         )
+
         DataError.Network.FORBIDDEN -> UiText.StringResource(
             R.string.error_forbidden
         )
+
         DataError.Network.UNAUTHORIZED -> UiText.StringResource(
             R.string.error_unauthorized
         )

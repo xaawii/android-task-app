@@ -17,9 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.core.presentation.components.LoadingComponent
@@ -35,7 +35,7 @@ import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
 fun AddTaskScreen(
     navigationController: NavHostController,
     addTaskViewModel: AddTaskViewModel,
-    taskId: Long = 0
+    taskId: Long = 0L
 ) {
 
     val context = LocalContext.current

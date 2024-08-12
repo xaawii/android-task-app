@@ -5,8 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalLifecycleOwner
+
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.auth.presentation.state.InitUIState
@@ -37,8 +38,8 @@ fun InitScreen(initViewModel: InitViewModel, navigationController: NavHostContro
 
     when (uiState) {
         InitUIState.Authenticated -> {
-            navigationController.navigate(Routes.TasksListScreen.route){
-                    popUpTo(Routes.InitScreen.route) { inclusive = true }
+            navigationController.navigate(Routes.TasksListScreen) {
+                popUpTo(Routes.InitScreen) { inclusive = true }
             }
         }
 
@@ -51,8 +52,8 @@ fun InitScreen(initViewModel: InitViewModel, navigationController: NavHostContro
         }
 
         InitUIState.Unauthenticated -> {
-            navigationController.navigate(Routes.LoginScreen.route){
-                popUpTo(Routes.InitScreen.route) { inclusive = true }
+            navigationController.navigate(Routes.LoginScreen) {
+                popUpTo(Routes.InitScreen) { inclusive = true }
             }
         }
     }

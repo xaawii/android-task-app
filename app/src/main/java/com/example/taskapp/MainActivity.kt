@@ -3,16 +3,16 @@ package com.example.taskapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.taskapp.auth.presentation.screens.InitScreen
 import com.example.taskapp.auth.presentation.screens.LoginScreen
 import com.example.taskapp.auth.presentation.screens.RegisterScreen
@@ -24,7 +24,7 @@ import com.example.taskapp.task.presentation.screens.AddTaskScreen
 import com.example.taskapp.task.presentation.screens.TaskScreen
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
-import com.example.taskapp.ui.theme.TaskAppTheme
+import com.example.taskapp.ui.theme.NewAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -38,54 +38,49 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            TaskAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-
+            NewAppTheme {
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background) {
                     val navigationController = rememberNavController()
+
 
                     NavHost(
                         navController = navigationController,
-                        startDestination = Routes.InitScreen.route
+                        startDestination = Routes.InitScreen
                     ) {
 
-                        composable(Routes.InitScreen.route) {
+                        composable<Routes.InitScreen> {
                             InitScreen(
                                 initViewModel = initViewModel,
                                 navigationController = navigationController
                             )
                         }
 
-                        composable(Routes.LoginScreen.route) {
+                        composable<Routes.LoginScreen> {
                             LoginScreen(loginViewModel, navigationController)
                         }
 
-                        composable(Routes.RegisterScreen.route) {
+                        composable<Routes.RegisterScreen> {
                             RegisterScreen(registerViewModel, navigationController)
                         }
 
-                        composable(Routes.TasksListScreen.route) {
+                        composable<Routes.TasksListScreen> {
                             TaskScreen(
                                 taskListViewModel,
                                 navigationController
                             )
                         }
 
-                        composable(
-                            Routes.AddTask.route,
-                            arguments = listOf(navArgument("taskId") { type = NavType.LongType })
-                        ) {
+                        composable<Routes.AddTask> {
+                            val args = it.toRoute<Routes.AddTask>()
                             AddTaskScreen(
                                 navigationController = navigationController,
                                 addTaskViewModel,
-                                it.arguments?.getLong("taskId") ?: 0L
+                                taskId = args.id ?: 0L
                             )
                         }
-
 
                     }
 
@@ -94,4 +89,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

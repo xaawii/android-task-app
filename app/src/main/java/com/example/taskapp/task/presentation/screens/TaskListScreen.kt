@@ -7,7 +7,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -54,12 +53,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.core.presentation.components.LoadingComponent
@@ -120,8 +119,8 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
         }
 
         TaskListUIState.LogOut -> {
-            navigationController.navigate(Routes.LoginScreen.route){
-                popUpTo(Routes.TasksListScreen.route) { inclusive = true }
+            navigationController.navigate(Routes.LoginScreen) {
+                popUpTo(Routes.TasksListScreen) { inclusive = true }
             }
         }
     }
@@ -138,7 +137,7 @@ private fun MainBody(
 
     Scaffold(
         topBar = { MyTopAppBar(onLogOut = taskListViewModel::logOut) },
-        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask.createRoute(0L)) } },
+        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
         Column(
@@ -226,7 +225,6 @@ private fun WelcomeUserHeader() {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TasksList(
     tasks: List<TaskUIModel>,
@@ -237,15 +235,16 @@ private fun TasksList(
     LazyColumn {
 
         items(tasks, key = { it.id }) {
+
             ItemTask(
                 Modifier
-                    .clickable { navigationController.navigate(Routes.AddTask.createRoute(it.id)) }
-                    .animateItemPlacement(
-                        animationSpec = spring(
+                    .animateItem(
+                        fadeInSpec = null, fadeOutSpec = null, placementSpec = spring(
                             dampingRatio = Spring.DampingRatioHighBouncy,
                             stiffness = Spring.StiffnessLow
                         )
-                    ),
+                    )
+                    .clickable { navigationController.navigate(Routes.AddTask(id = it.id)) },
                 taskModel = it, taskListViewModel = taskListViewModel
             )
         }

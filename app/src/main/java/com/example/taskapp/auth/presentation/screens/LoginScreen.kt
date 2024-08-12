@@ -16,9 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.auth.presentation.state.LoginUIState
@@ -65,8 +66,8 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
         }
 
         LoginUIState.Success -> {
-            navigationController.navigate(Routes.TasksListScreen.route){
-                popUpTo(Routes.LoginScreen.route) { inclusive = true }
+            navigationController.navigate(Routes.TasksListScreen) {
+                popUpTo(Routes.LoginScreen) { inclusive = true }
             }
             loginViewModel.resetState()
         }
@@ -102,15 +103,17 @@ private fun MainBody(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = loginViewModel::login,
-            enabled = uiState.formIsValid) {
+        TextButton(
+            onClick = loginViewModel::login,
+            enabled = uiState.formIsValid
+        ) {
             Text(text = "Sign In")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(
-            onClick = { navigationController.navigate(Routes.RegisterScreen.route) }
+            onClick = { navigationController.navigate(Routes.RegisterScreen) }
         ) {
             Text(text = "Don't have an account? Sign Up")
         }

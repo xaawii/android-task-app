@@ -1,9 +1,9 @@
 package com.example.taskapp.core.di
 
+
 import com.example.taskapp.BuildConfig
 import com.example.taskapp.core.data.local.datastore.DataStoreManager
 import com.example.taskapp.core.utils.LocalDateTimeConverter
-import com.example.taskapp.task.data.remote.api.TaskApiClient
 import com.example.taskapp.core.data.remote.interceptors.AccessTokenInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
