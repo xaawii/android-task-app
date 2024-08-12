@@ -36,4 +36,12 @@ class DataStoreManagerImpl @Inject constructor(private val dataStore: DataStore<
         return dataStore.data.firstOrNull()?.get(stringPreferencesKey("email"))
     }
 
+    override suspend fun saveUserName(value: String) {
+        dataStore.edit { it[stringPreferencesKey("name")] = value }
+    }
+
+    override suspend fun getUserName(): String? {
+        return dataStore.data.firstOrNull()?.get(stringPreferencesKey("name"))
+    }
+
 }

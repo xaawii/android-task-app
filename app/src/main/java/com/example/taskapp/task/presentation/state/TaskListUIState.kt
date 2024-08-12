@@ -7,4 +7,5 @@ sealed class TaskListUIState {
     data object Loading : TaskListUIState()
     data class Success(val tasks: List<TaskUIModel>) : TaskListUIState()
     data class Error(val message: UiText) : TaskListUIState()
+    data object LogOut : TaskListUIState()
 }

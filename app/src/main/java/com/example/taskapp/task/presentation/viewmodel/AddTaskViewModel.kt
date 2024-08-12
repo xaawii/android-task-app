@@ -35,7 +35,15 @@ class AddTaskViewModel @Inject constructor(
     fun getEmptyForm() {
         viewModelScope.launch {
 
-            _uiState.value = AddTaskUIState.Editing()
+            val now = LocalDateTime.now()
+
+            _uiState.value = AddTaskUIState.Editing(
+                dueDate = dataConverters.formatLocalDateTimeToDateTimeString(now),
+                dueTime = dataConverters.formatTimeToString(
+                    hour = now.hour,
+                    minute = now.minute
+                )
+            )
 
         }
     }
@@ -62,6 +70,8 @@ class AddTaskViewModel @Inject constructor(
                             taskStatus = task.status,
                             mode = "update"
                         )
+
+                    checkFormIsValid()
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.example.taskapp.task.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCase
 import com.example.taskapp.core.domain.validator.Result
 import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class TaskListViewModel @Inject constructor(
     private val taskUIModelMapper: TaskUIModelMapper,
     private val getAllTasksByUserIdUseCase: GetAllTasksByUserIdUseCase,
-    private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase
+    private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase,
+    private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow<TaskListUIState>(TaskListUIState.Loading)
@@ -65,6 +67,13 @@ class TaskListViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun logOut() {
+        viewModelScope.launch {
+            _uiState.value = TaskListUIState.LogOut
+            deleteUserDataFromDataStoreUseCase()
+        }
     }
 
 }

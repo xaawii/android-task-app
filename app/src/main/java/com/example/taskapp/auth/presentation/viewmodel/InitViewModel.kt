@@ -2,9 +2,9 @@ package com.example.taskapp.auth.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.taskapp.auth.domain.usecases.DeleteUserDataFromPreferencesUseCase
 import com.example.taskapp.auth.domain.usecases.GetUserTokenUseCase
 import com.example.taskapp.auth.presentation.state.InitUIState
+import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCase
 import com.example.taskapp.core.domain.usecases.ValidateTokenUseCase
 import com.example.taskapp.core.domain.validator.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class InitViewModel @Inject constructor(
     private val getUserTokenUseCase: GetUserTokenUseCase,
     private val validateTokenUseCase: ValidateTokenUseCase,
-    private val deleteUserDataFromPreferencesUseCase: DeleteUserDataFromPreferencesUseCase
+    private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase
 ) :
     ViewModel() {
     private var _uiState = MutableStateFlow<InitUIState>(InitUIState.Loading)
@@ -45,7 +45,7 @@ class InitViewModel @Inject constructor(
 
     private fun removeUserData() {
         viewModelScope.launch {
-            deleteUserDataFromPreferencesUseCase.invoke()
+            deleteUserDataFromDataStoreUseCase()
         }
     }
 }

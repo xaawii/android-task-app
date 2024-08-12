@@ -37,7 +37,9 @@ fun InitScreen(initViewModel: InitViewModel, navigationController: NavHostContro
 
     when (uiState) {
         InitUIState.Authenticated -> {
-            navigationController.navigate(Routes.TasksListScreen.route)
+            navigationController.navigate(Routes.TasksListScreen.route){
+                    popUpTo(Routes.InitScreen.route) { inclusive = true }
+            }
         }
 
         is InitUIState.Error -> {
@@ -49,7 +51,9 @@ fun InitScreen(initViewModel: InitViewModel, navigationController: NavHostContro
         }
 
         InitUIState.Unauthenticated -> {
-            navigationController.navigate(Routes.LoginScreen.route)
+            navigationController.navigate(Routes.LoginScreen.route){
+                popUpTo(Routes.InitScreen.route) { inclusive = true }
+            }
         }
     }
 

@@ -11,5 +11,8 @@ interface DataStoreManager {
     suspend fun saveUserEmail(value: String)
     suspend fun getUserEmail(): String?
 
+    suspend fun saveUserName(value: String)
+    suspend fun getUserName(): String?
+
 
 }

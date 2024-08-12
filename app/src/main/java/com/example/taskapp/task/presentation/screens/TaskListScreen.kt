@@ -118,6 +118,12 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
                 navigationController
             )
         }
+
+        TaskListUIState.LogOut -> {
+            navigationController.navigate(Routes.LoginScreen.route){
+                popUpTo(Routes.TasksListScreen.route) { inclusive = true }
+            }
+        }
     }
 
 
@@ -131,7 +137,7 @@ private fun MainBody(
 ) {
 
     Scaffold(
-        topBar = { MyTopAppBar() },
+        topBar = { MyTopAppBar(onLogOut = taskListViewModel::logOut) },
         floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask.createRoute(0L)) } },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
@@ -152,7 +158,7 @@ private fun MainBody(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar() {
+fun MyTopAppBar(onLogOut: () -> Unit) {
     TopAppBar(
         title = { Text(text = "TaskApp") },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -161,7 +167,7 @@ fun MyTopAppBar() {
             actionIconContentColor = Color.White
         ),
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onLogOut) {
                 Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "options")
             }
         })

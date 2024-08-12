@@ -65,7 +65,9 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
         }
 
         LoginUIState.Success -> {
-            navigationController.navigate(Routes.TasksListScreen.route)
+            navigationController.navigate(Routes.TasksListScreen.route){
+                popUpTo(Routes.LoginScreen.route) { inclusive = true }
+            }
             loginViewModel.resetState()
         }
     }
