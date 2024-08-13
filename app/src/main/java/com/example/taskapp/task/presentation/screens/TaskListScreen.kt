@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -66,6 +68,7 @@ import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
+import com.example.taskapp.ui.theme.Greyed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
@@ -240,6 +243,23 @@ fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (L
     // Generar los días del mes actual
     val days = generateDaysInMonth(yearMonth)
 
+    // Recordar el estado de la lista
+    val listState = rememberLazyListState()
+
+    // Obtener el índice del día seleccionado
+    val selectedIndex = days.indexOf(selectedDate)
+
+    // Desplazar el LazyRow al índice seleccionado cuando cambie la fecha seleccionada
+    LaunchedEffect(selectedIndex) {
+        if (selectedIndex != -1) {
+            listState.animateScrollToItem(
+                index = selectedIndex,
+                scrollOffset = -calculateScrollOffset(listState)
+            )
+        }
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,6 +274,7 @@ fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (L
 
         // LazyRow para hacer scroll horizontalmente por los días
         LazyRow(
+            state = listState,
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp)
@@ -271,18 +292,34 @@ fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (L
     }
 }
 
+private fun calculateScrollOffset(listState: LazyListState): Int {
+    val layoutInfo = listState.layoutInfo
+    val visibleItemsInfo = layoutInfo.visibleItemsInfo
+    val selectedItemInfo = visibleItemsInfo.find { it.index == listState.firstVisibleItemIndex }
+
+    return if (selectedItemInfo != null) {
+        val parentCenter = layoutInfo.viewportEndOffset / 2
+        val itemCenter = selectedItemInfo.offset + (selectedItemInfo.size / 2)
+        parentCenter - itemCenter
+    } else {
+        0
+    }
+}
+
 @Composable
 fun DayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val textColor = if (isSelected) Color.White else Color.Black
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent
+    val textColor = if (isSelected) Color.White else Greyed
 
     Column(
         modifier = Modifier
             .size(48.dp)
+            .clip(RoundedCornerShape(100.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
         Text(
             text = date.dayOfMonth.toString(),

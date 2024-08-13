@@ -8,7 +8,7 @@ import java.time.YearMonth
 sealed class TaskListUIState {
     data object Loading : TaskListUIState()
     data class Success(
-        val tasks: List<TaskUIModel>,
+        val tasks: List<TaskUIModel> = emptyList(),
         val selectedDate: LocalDate = LocalDate.now(),
         val yearMonth: YearMonth = YearMonth.now()
     ) : TaskListUIState()

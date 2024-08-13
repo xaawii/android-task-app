@@ -49,7 +49,8 @@ class TaskListViewModel @Inject constructor(
                 is Result.Success -> {
                     taskList =
                         taskUIModelMapper.fromDomainListToUIList(result.data).toMutableList()
-                    _uiState.value = TaskListUIState.Success(filterTasksBySelectedDay(taskList))
+                    _uiState.value = TaskListUIState.Success()
+                    filterTasksBySelectedDay()
                 }
             }
 
@@ -63,7 +64,7 @@ class TaskListViewModel @Inject constructor(
                     is Result.Error -> _taskDeletedEvent.emit(false)
                     is Result.Success -> {
                         taskList.removeIf { it.id == taskUIModel.id }
-                        _uiState.value = copy(tasks = filterTasksBySelectedDay(taskList))
+                        filterTasksBySelectedDay()
                         _taskDeletedEvent.emit(true)
                     }
                 }
@@ -75,16 +76,17 @@ class TaskListViewModel @Inject constructor(
 
     fun changeSelectedDate(newDate: LocalDate) {
         (_uiState.value as? TaskListUIState.Success)?.apply {
-            _uiState.value = copy(selectedDate = newDate, tasks = filterTasksBySelectedDay(taskList))
+            _uiState.value = copy(selectedDate = newDate)
+            filterTasksBySelectedDay()
         }
+
+
     }
 
-    private fun filterTasksBySelectedDay(tasks: MutableList<TaskUIModel>): List<TaskUIModel> {
-
+    private fun filterTasksBySelectedDay(){
         (_uiState.value as? TaskListUIState.Success)?.apply {
-            return tasks.filter { it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth }.toList()
+            _uiState.value = copy(tasks = taskList.filter { it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth }.toList())
         }
-        return emptyList()
     }
 
     fun logOut() {
