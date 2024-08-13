@@ -9,17 +9,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +33,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
@@ -53,8 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -68,6 +68,9 @@ import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
@@ -112,7 +115,7 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
 
         is TaskListUIState.Success -> {
             MainBody(
-                (uiState as TaskListUIState.Success).tasks,
+                (uiState as TaskListUIState.Success),
                 taskListViewModel,
                 navigationController
             )
@@ -130,7 +133,7 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
 
 @Composable
 private fun MainBody(
-    tasks: List<TaskUIModel>,
+    uiState: TaskListUIState.Success,
     taskListViewModel: TaskListViewModel,
     navigationController: NavHostController
 ) {
@@ -143,27 +146,38 @@ private fun MainBody(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Blue)
                 .padding(contentPadding)
 
         ) {
             WelcomeUserHeader()
-            CardTaskBody(tasks, taskListViewModel, navigationController)
+            CalendarView(
+                selectedDate = uiState.selectedDate,
+                yearMonth = uiState.yearMonth,
+                onDateChange = taskListViewModel::changeSelectedDate
+            )
+
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if (uiState.tasks.isEmpty()) {
+                    Text(text = "No tasks for today", textAlign = TextAlign.Center)
+                } else {
+                    CardTaskBody(uiState.tasks, taskListViewModel, navigationController)
+                }
+            }
+
         }
 
     }
 
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTopAppBar(onLogOut: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "TaskApp") },
+        title = { Text(text = "") },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Blue,
-            titleContentColor = Color.White,
-            actionIconContentColor = Color.White
+            containerColor = Color.Transparent
         ),
         actions = {
             IconButton(onClick = onLogOut) {
@@ -197,11 +211,6 @@ private fun CardTaskBody(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = "Tareas",
-                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            )
-            Spacer(Modifier.height(8.dp))
             TasksList(tasks, taskListViewModel, navigationController)
         }
 
@@ -215,13 +224,79 @@ private fun WelcomeUserHeader() {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 38.dp), horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Hola,", style = TextStyle(fontSize = 16.sp, color = Color.White))
+        Text(text = "Hola,")
         Text(
-            text = "Xavi",
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            modifier = Modifier.padding(start = 8.dp),
+            text = "Xavi"
         )
     }
 
+}
+
+@Composable
+fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (LocalDate) -> Unit) {
+
+
+    // Generar los días del mes actual
+    val days = generateDaysInMonth(yearMonth)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Muestra el mes y el año actual
+        Text(
+            text = yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        // LazyRow para hacer scroll horizontalmente por los días
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(days) { day ->
+                val isSelected = selectedDate == day
+
+                DayItem(
+                    date = day,
+                    isSelected = isSelected,
+                    onClick = { onDateChange(day) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val textColor = if (isSelected) Color.White else Color.Black
+
+    Column(
+        modifier = Modifier
+            .size(48.dp)
+            .background(backgroundColor)
+            .clickable(onClick = onClick),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = date.dayOfMonth.toString(),
+            color = textColor,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+fun generateDaysInMonth(yearMonth: YearMonth): List<LocalDate> {
+    return (1..yearMonth.lengthOfMonth()).map { day ->
+        yearMonth.atDay(day)
+    }
 }
 
 

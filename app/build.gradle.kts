@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.google.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -63,6 +64,7 @@ composeCompiler {
 }
 
 dependencies {
+
 
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.serialization.json)

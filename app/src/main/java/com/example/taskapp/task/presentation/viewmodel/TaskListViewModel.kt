@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,7 +49,7 @@ class TaskListViewModel @Inject constructor(
                 is Result.Success -> {
                     taskList =
                         taskUIModelMapper.fromDomainListToUIList(result.data).toMutableList()
-                    _uiState.value = TaskListUIState.Success(taskList.toList())
+                    _uiState.value = TaskListUIState.Success(filterTasksBySelectedDay(taskList))
                 }
             }
 
@@ -56,17 +58,33 @@ class TaskListViewModel @Inject constructor(
 
     fun onItemRemove(taskUIModel: TaskUIModel) {
         viewModelScope.launch {
-
-            when (deleteTaskByIdUseCase(taskUIModel.id)) {
-                is Result.Error -> _taskDeletedEvent.emit(false)
-                is Result.Success -> {
-                    taskList.removeIf { it.id == taskUIModel.id }
-                    _uiState.value = TaskListUIState.Success(taskList.toList())
-                    _taskDeletedEvent.emit(true)
+            (_uiState.value as? TaskListUIState.Success)?.apply {
+                when (deleteTaskByIdUseCase(taskUIModel.id)) {
+                    is Result.Error -> _taskDeletedEvent.emit(false)
+                    is Result.Success -> {
+                        taskList.removeIf { it.id == taskUIModel.id }
+                        _uiState.value = copy(tasks = filterTasksBySelectedDay(taskList))
+                        _taskDeletedEvent.emit(true)
+                    }
                 }
             }
+
         }
 
+    }
+
+    fun changeSelectedDate(newDate: LocalDate) {
+        (_uiState.value as? TaskListUIState.Success)?.apply {
+            _uiState.value = copy(selectedDate = newDate, tasks = filterTasksBySelectedDay(taskList))
+        }
+    }
+
+    private fun filterTasksBySelectedDay(tasks: MutableList<TaskUIModel>): List<TaskUIModel> {
+
+        (_uiState.value as? TaskListUIState.Success)?.apply {
+            return tasks.filter { it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth }.toList()
+        }
+        return emptyList()
     }
 
     fun logOut() {
