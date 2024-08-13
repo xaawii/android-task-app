@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCase
 import com.example.taskapp.core.domain.validator.Result
 import com.example.taskapp.core.presentation.utils.asUiText
+import com.example.taskapp.core.utils.DataConverters
+import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
 import com.example.taskapp.task.domain.usecases.GetAllTasksByUserIdUseCase
+import com.example.taskapp.task.domain.usecases.UpdateTaskUseCase
 import com.example.taskapp.task.mappers.TaskUIModelMapper
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
@@ -25,7 +28,9 @@ class TaskListViewModel @Inject constructor(
     private val taskUIModelMapper: TaskUIModelMapper,
     private val getAllTasksByUserIdUseCase: GetAllTasksByUserIdUseCase,
     private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase,
-    private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase
+    private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
+    private val dataConverters: DataConverters
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow<TaskListUIState>(TaskListUIState.Loading)
@@ -87,6 +92,30 @@ class TaskListViewModel @Inject constructor(
         (_uiState.value as? TaskListUIState.Success)?.apply {
             _uiState.value = copy(tasks = taskList.filter { it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth }.toList())
         }
+    }
+
+    fun updateTaskStatus(isCompleted: Boolean, taskId: Long) {
+        viewModelScope.launch {
+            val status = if (isCompleted) TaskStatus.COMPLETED else TaskStatus.PENDING
+
+            val taskIndex = taskList.indexOfFirst { it.id == taskId }
+            if (taskIndex != -1) {
+                val updatedTask = taskList[taskIndex].copy(status = status)
+                taskList[taskIndex] = updatedTask
+
+                when (val result = updateTaskUseCase(taskUIModelMapper.fromUItoDomain(updatedTask))) {
+                    is Result.Error -> {
+                        println(result.error)
+                    }
+                    is Result.Success -> filterTasksBySelectedDay()
+
+                }
+            }
+        }
+    }
+
+    fun formatTimeToString(hour: Int, minute: Int): String {
+        return dataConverters.formatTimeToString(hour, minute)
     }
 
     fun logOut() {

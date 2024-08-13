@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -56,22 +59,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
+import com.example.taskapp.R
+import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.routes.Routes
+import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
+import com.example.taskapp.ui.theme.BlueLight
+import com.example.taskapp.ui.theme.Green
 import com.example.taskapp.ui.theme.Greyed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -141,33 +150,45 @@ private fun MainBody(
     navigationController: NavHostController
 ) {
 
+
     Scaffold(
         topBar = { MyTopAppBar(onLogOut = taskListViewModel::logOut) },
         floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
 
-        ) {
-            WelcomeUserHeader()
-            CalendarView(
-                selectedDate = uiState.selectedDate,
-                yearMonth = uiState.yearMonth,
-                onDateChange = taskListViewModel::changeSelectedDate
-            )
+        CircleBackground(color = MaterialTheme.colorScheme.primary) {
 
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                if (uiState.tasks.isEmpty()) {
-                    Text(text = "No tasks for today", textAlign = TextAlign.Center)
-                } else {
-                    CardTaskBody(uiState.tasks, taskListViewModel, navigationController)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+
+            ) {
+
+                WelcomeUserHeader()
+                Spacer(modifier = Modifier.height(32.dp))
+                CalendarView(
+                    selectedDate = uiState.selectedDate,
+                    yearMonth = uiState.yearMonth,
+                    onDateChange = taskListViewModel::changeSelectedDate
+                )
+
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    if (uiState.tasks.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.no_tasks_this_day),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    } else {
+                        CardTaskBody(uiState.tasks, taskListViewModel, navigationController)
+                    }
                 }
-            }
 
+            }
         }
+
 
     }
 
@@ -205,9 +226,8 @@ private fun CardTaskBody(
     taskListViewModel: TaskListViewModel,
     navigationController: NavHostController
 ) {
-    Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             Modifier
@@ -225,16 +245,18 @@ private fun WelcomeUserHeader() {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 38.dp), horizontalAlignment = Alignment.Start
+            .padding(horizontal = 16.dp), horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Hola,")
+        Text(text = stringResource(R.string.hello), style = MaterialTheme.typography.bodyLarge)
         Text(
             modifier = Modifier.padding(start = 8.dp),
-            text = "Xavi"
+            text = "Xavi",
+            style = MaterialTheme.typography.titleMedium
         )
     }
 
 }
+
 
 @Composable
 fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (LocalDate) -> Unit) {
@@ -324,7 +346,7 @@ fun DayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
         Text(
             text = date.dayOfMonth.toString(),
             color = textColor,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
     }
@@ -376,38 +398,73 @@ fun ItemTask(
         paddingValues = PaddingValues(vertical = 8.dp),
         cornerShape = RoundedCornerShape(12.dp)
     ) {
-        TaskCard(modifier = modifier, taskModel = taskModel)
+        TaskCard(
+            modifier = modifier,
+            taskModel = taskModel,
+            formatDate = {
+                taskListViewModel.formatTimeToString(
+                    hour = it.hour,
+                    minute = it.minute
+                )
+            },
+            onCheckedChange = taskListViewModel::updateTaskStatus
+        )
     }
 }
 
 @Composable
 private fun TaskCard(
     modifier: Modifier,
-    taskModel: TaskUIModel
+    taskModel: TaskUIModel,
+    formatDate: (LocalDateTime) -> String,
+    onCheckedChange: (Boolean, Long) -> Unit
 ) {
+
+    val color = when (taskModel.status) {
+        TaskStatus.PENDING -> Color.White
+        TaskStatus.IN_PROGRESS -> BlueLight
+        TaskStatus.COMPLETED -> Green
+    }
     Card(
         modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = color)
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp), verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Green),
-            )
-            Text(
-                text = taskModel.title, modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp)
-            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = taskModel.title, modifier = Modifier
+                        .padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Row {
+                    Text(
+                        text = formatDate(taskModel.dueDate), modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(text = "·", style = MaterialTheme.typography.bodySmall )
+                    Text(
+                        text = taskModel.status.name, modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+
+            }
+
+            Checkbox(
+                checked = taskModel.status == TaskStatus.COMPLETED,
+                onCheckedChange = { onCheckedChange(it, taskModel.id) })
+
         }
     }
 }

@@ -12,4 +12,6 @@
     <string name="error_not_found">Error: Not Found</string>
     <string name="error_forbidden">Error: Forbidden</string>
     <string name="error_unauthorized">Error: Unauthorized</string>
+    <string name="no_tasks_this_day">No tasks for this day</string>
+    <string name="hello">Hello</string>
 </resources>
