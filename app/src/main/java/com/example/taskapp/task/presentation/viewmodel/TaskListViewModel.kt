@@ -46,6 +46,10 @@ class TaskListViewModel @Inject constructor(
     private val _taskDeletedEvent = MutableSharedFlow<Boolean>()
     val taskDeletedEvent: SharedFlow<Boolean> = _taskDeletedEvent
 
+    //change status event
+    private val _taskStatusEvent = MutableSharedFlow<Boolean>()
+    val taskStatusEvent: SharedFlow<Boolean> = _taskStatusEvent
+
 
     fun getTasks() {
         viewModelScope.launch {
@@ -111,11 +115,12 @@ class TaskListViewModel @Inject constructor(
 
                 when (val result =
                     updateTaskUseCase(taskUIModelMapper.fromUItoDomain(updatedTask))) {
-                    is Result.Error -> {
-                        println(result.error)
-                    }
+                    is Result.Error -> _taskStatusEvent.emit(false)
 
-                    is Result.Success -> filterTasksBySelectedDay()
+                    is Result.Success -> {
+                        _taskStatusEvent.emit(true)
+                        filterTasksBySelectedDay()
+                    }
 
                 }
             }

@@ -18,7 +18,7 @@ fun CircleBackground(color: Color, contentOver: @Composable () -> Unit) {
     ) {
         Canvas(
             modifier = Modifier
-                .size(700.dp)
+                .size(600.dp)
                 .offset((-100).dp, (-350).dp)
         ) {
             drawCircle(color = color)

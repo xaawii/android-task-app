@@ -30,6 +30,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -86,9 +87,32 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
     LaunchedEffect(key1 = taskListViewModel.taskDeletedEvent) {
         taskListViewModel.taskDeletedEvent.collectLatest {
             if (it) {
-                Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.task_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
-                Toast.makeText(context, "Failed to delete task", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.failed_to_delete_task), Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = taskListViewModel.taskStatusEvent) {
+        taskListViewModel.taskStatusEvent.collectLatest {
+            if (it) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.task_status_updated), Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.failed_to_update_tasks_status), Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -140,22 +164,23 @@ private fun MainBody(
 ) {
 
 
-    Scaffold(
-        topBar = { MyTopAppBar(taskListViewModel) },
-        floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
-        floatingActionButtonPosition = FabPosition.End
-    ) { contentPadding ->
-
-        CircleBackground(color = MaterialTheme.colorScheme.primary) {
+    CircleBackground(color = MaterialTheme.colorScheme.primary) {
+        Scaffold(
+            topBar = { MyTopAppBar(uiState.userName, taskListViewModel) },
+            floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
+            floatingActionButtonPosition = FabPosition.End,
+            containerColor = Color.Transparent
+        ) { contentPadding ->
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-
+                    .fillMaxWidth()
+                    .padding(contentPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                WelcomeUserHeader(userName = uiState.userName)
+                //calendar
+
                 Spacer(modifier = Modifier.height(32.dp))
                 SingleRowCalendarWithHorizontalScroll(
                     selectedDate = uiState.selectedDate,
@@ -167,30 +192,66 @@ private fun MainBody(
                     nextMonth = { taskListViewModel.changeMonth(true) }
                 )
 
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    if (uiState.tasks.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.no_tasks_this_day),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    } else {
-                        CardTaskBody(uiState.tasks, taskListViewModel, navigationController)
-                    }
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                //task list
+                if (uiState.tasks.isEmpty()) {
+                    NoTaskText()
+                } else {
+                    TaskLazyList(uiState, navigationController, taskListViewModel)
+
                 }
-
             }
+
         }
-
-
     }
 
+}
+
+@Composable
+private fun TaskLazyList(
+    uiState: TaskListUIState.Success,
+    navigationController: NavHostController,
+    taskListViewModel: TaskListViewModel
+) {
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)) {
+        items(uiState.tasks, key = { it.id }) {
+            ItemTask(
+                Modifier
+                    .animateItem(
+                        fadeInSpec = null,
+                        fadeOutSpec = null,
+                        placementSpec = spring(
+                            dampingRatio = Spring.DampingRatioHighBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
+                    .clickable { navigationController.navigate(Routes.AddTask(id = it.id)) },
+                taskModel = it, taskListViewModel = taskListViewModel
+            )
+
+        }
+    }
+}
+
+@Composable
+private fun NoTaskText() {
+
+    Box (Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        Text(
+            text = stringResource(R.string.no_tasks_this_day),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar(taskListViewModel: TaskListViewModel) {
+fun MyTopAppBar(userName: String, taskListViewModel: TaskListViewModel) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -201,7 +262,7 @@ fun MyTopAppBar(taskListViewModel: TaskListViewModel) {
         ) { taskListViewModel.logOut() })
 
     TopAppBar(
-        title = { Text(text = "") },
+        title = { WelcomeUserHeader(userName = userName) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent
         ),
@@ -251,68 +312,24 @@ fun MyFAB(onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun CardTaskBody(
-    tasks: List<TaskUIModel>,
-    taskListViewModel: TaskListViewModel,
-    navigationController: NavHostController
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            TasksList(tasks, taskListViewModel, navigationController)
-        }
-
-    }
-}
 
 @Composable
 private fun WelcomeUserHeader(userName: String) {
-    Column(
+    Row(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp), horizontalAlignment = Alignment.Start
     ) {
-        Text(text = stringResource(R.string.hello), style = MaterialTheme.typography.bodyLarge)
         Text(
-            modifier = Modifier.padding(start = 8.dp),
+            text = stringResource(R.string.hello) + ",",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            modifier = Modifier.padding(start = 4.dp),
             text = userName,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleSmall
         )
     }
 
-}
-
-
-@Composable
-private fun TasksList(
-    tasks: List<TaskUIModel>,
-    taskListViewModel: TaskListViewModel,
-    navigationController: NavHostController
-) {
-
-    LazyColumn {
-
-        items(tasks, key = { it.id }) {
-
-            ItemTask(
-                Modifier
-                    .animateItem(
-                        fadeInSpec = null, fadeOutSpec = null, placementSpec = spring(
-                            dampingRatio = Spring.DampingRatioHighBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    )
-                    .clickable { navigationController.navigate(Routes.AddTask(id = it.id)) },
-                taskModel = it, taskListViewModel = taskListViewModel
-            )
-        }
-    }
 }
 
 
