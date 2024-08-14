@@ -1,15 +1,9 @@
 package com.example.taskapp.task.presentation.screens
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,20 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -40,23 +30,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxState
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -69,20 +51,18 @@ import androidx.navigation.NavHostController
 import com.example.taskapp.R
 import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.components.SwipeToDeleteContainer
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
+import com.example.taskapp.task.presentation.components.SingleRowCalendarWithHorizontalScroll
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
 import com.example.taskapp.ui.theme.BlueLight
 import com.example.taskapp.ui.theme.Green
-import com.example.taskapp.ui.theme.Greyed
-import kotlinx.coroutines.delay
+import com.example.taskapp.ui.theme.Lavender
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
@@ -168,10 +148,14 @@ private fun MainBody(
 
                 WelcomeUserHeader()
                 Spacer(modifier = Modifier.height(32.dp))
-                CalendarView(
+                SingleRowCalendarWithHorizontalScroll(
                     selectedDate = uiState.selectedDate,
                     yearMonth = uiState.yearMonth,
-                    onDateChange = taskListViewModel::changeSelectedDate
+                    onDateChange = taskListViewModel::changeSelectedDate,
+                    generateDaysInMonth = taskListViewModel::generateDaysInMonth,
+                    calculateScrollOffset = taskListViewModel::calculateScrollOffset,
+                    previousMonth = { taskListViewModel.changeMonth(false) },
+                    nextMonth = { taskListViewModel.changeMonth(true) }
                 )
 
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -215,6 +199,7 @@ fun MyTopAppBar(onLogOut: () -> Unit) {
 fun MyFAB(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = { onClick() },
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "add")
     }
@@ -255,107 +240,6 @@ private fun WelcomeUserHeader() {
         )
     }
 
-}
-
-
-@Composable
-fun CalendarView(selectedDate: LocalDate, yearMonth: YearMonth, onDateChange: (LocalDate) -> Unit) {
-
-
-    // Generar los días del mes actual
-    val days = generateDaysInMonth(yearMonth)
-
-    // Recordar el estado de la lista
-    val listState = rememberLazyListState()
-
-    // Obtener el índice del día seleccionado
-    val selectedIndex = days.indexOf(selectedDate)
-
-    // Desplazar el LazyRow al índice seleccionado cuando cambie la fecha seleccionada
-    LaunchedEffect(selectedIndex) {
-        if (selectedIndex != -1) {
-            listState.animateScrollToItem(
-                index = selectedIndex,
-                scrollOffset = -calculateScrollOffset(listState)
-            )
-        }
-    }
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Muestra el mes y el año actual
-        Text(
-            text = yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        // LazyRow para hacer scroll horizontalmente por los días
-        LazyRow(
-            state = listState,
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp)
-        ) {
-            items(days) { day ->
-                val isSelected = selectedDate == day
-
-                DayItem(
-                    date = day,
-                    isSelected = isSelected,
-                    onClick = { onDateChange(day) }
-                )
-            }
-        }
-    }
-}
-
-private fun calculateScrollOffset(listState: LazyListState): Int {
-    val layoutInfo = listState.layoutInfo
-    val visibleItemsInfo = layoutInfo.visibleItemsInfo
-    val selectedItemInfo = visibleItemsInfo.find { it.index == listState.firstVisibleItemIndex }
-
-    return if (selectedItemInfo != null) {
-        val parentCenter = layoutInfo.viewportEndOffset / 2
-        val itemCenter = selectedItemInfo.offset + (selectedItemInfo.size / 2)
-        parentCenter - itemCenter
-    } else {
-        0
-    }
-}
-
-@Composable
-fun DayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent
-    val textColor = if (isSelected) Color.White else Greyed
-
-    Column(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(RoundedCornerShape(100.dp))
-            .background(backgroundColor)
-            .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ) {
-        Text(
-            text = date.dayOfMonth.toString(),
-            color = textColor,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-fun generateDaysInMonth(yearMonth: YearMonth): List<LocalDate> {
-    return (1..yearMonth.lengthOfMonth()).map { day ->
-        yearMonth.atDay(day)
-    }
 }
 
 
@@ -421,7 +305,7 @@ private fun TaskCard(
 ) {
 
     val color = when (taskModel.status) {
-        TaskStatus.PENDING -> Color.White
+        TaskStatus.PENDING -> MaterialTheme.colorScheme.tertiary
         TaskStatus.IN_PROGRESS -> BlueLight
         TaskStatus.COMPLETED -> Green
     }
@@ -450,7 +334,7 @@ private fun TaskCard(
                             .padding(horizontal = 8.dp),
                         style = MaterialTheme.typography.bodySmall
                     )
-                    Text(text = "·", style = MaterialTheme.typography.bodySmall )
+                    Text(text = "·", style = MaterialTheme.typography.bodySmall)
                     Text(
                         text = taskModel.status.name, modifier = Modifier
                             .padding(horizontal = 8.dp),
@@ -463,93 +347,18 @@ private fun TaskCard(
 
             Checkbox(
                 checked = taskModel.status == TaskStatus.COMPLETED,
-                onCheckedChange = { onCheckedChange(it, taskModel.id) })
-
-        }
-    }
-}
-
-
-//yt
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun <T> SwipeToDeleteContainer(
-    item: T,
-    onDelete: (T) -> Unit,
-    animationDuration: Int = 500,
-    paddingValues: PaddingValues = PaddingValues(0.dp),
-    cornerShape: RoundedCornerShape = RoundedCornerShape(0.dp),
-    content: @Composable (T) -> Unit
-) {
-    var isRemoved by remember {
-        mutableStateOf(false)
-    }
-    val state = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart) {
-                isRemoved = true
-                true
-            } else {
-                false
-            }
-        }
-    )
-
-    LaunchedEffect(key1 = isRemoved) {
-        if (isRemoved) {
-            delay(animationDuration.toLong())
-            onDelete(item)
-        }
-    }
-
-    AnimatedVisibility(
-        visible = !isRemoved,
-        exit = shrinkVertically(
-            animationSpec = tween(durationMillis = animationDuration),
-            shrinkTowards = Alignment.Top
-        ) + fadeOut()
-    ) {
-        SwipeToDismissBox(
-            state = state,
-            backgroundContent = {
-                DeleteBackground(
-                    swipeDismissState = state,
-                    paddingValues = paddingValues,
-                    cornerShape = cornerShape
+                onCheckedChange = { onCheckedChange(it, taskModel.id) },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = Lavender
                 )
-            },
-            content = { content(item) },
-            enableDismissFromEndToStart = true
-        )
+            )
 
+        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DeleteBackground(
-    swipeDismissState: SwipeToDismissBoxState,
-    paddingValues: PaddingValues,
-    cornerShape: RoundedCornerShape
-) {
-    val color = if (swipeDismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-        Color.Red
-    } else Color.Transparent
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .clip(cornerShape)
-            .background(color),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        Icon(
-            modifier = Modifier.padding(6.dp),
-            imageVector = Icons.Default.Delete,
-            contentDescription = null,
-            tint = Color.White
-        )
-    }
-}
+
+
 

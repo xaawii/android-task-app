@@ -1,5 +1,6 @@
 package com.example.taskapp.task.presentation.viewmodel
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCase
@@ -88,9 +89,11 @@ class TaskListViewModel @Inject constructor(
 
     }
 
-    private fun filterTasksBySelectedDay(){
+    private fun filterTasksBySelectedDay() {
         (_uiState.value as? TaskListUIState.Success)?.apply {
-            _uiState.value = copy(tasks = taskList.filter { it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth }.toList())
+            _uiState.value = copy(tasks = taskList.filter {
+                it.dueDate.toLocalDate() == selectedDate && YearMonth.from(it.dueDate) == yearMonth
+            }.toList())
         }
     }
 
@@ -103,10 +106,12 @@ class TaskListViewModel @Inject constructor(
                 val updatedTask = taskList[taskIndex].copy(status = status)
                 taskList[taskIndex] = updatedTask
 
-                when (val result = updateTaskUseCase(taskUIModelMapper.fromUItoDomain(updatedTask))) {
+                when (val result =
+                    updateTaskUseCase(taskUIModelMapper.fromUItoDomain(updatedTask))) {
                     is Result.Error -> {
                         println(result.error)
                     }
+
                     is Result.Success -> filterTasksBySelectedDay()
 
                 }
@@ -116,6 +121,33 @@ class TaskListViewModel @Inject constructor(
 
     fun formatTimeToString(hour: Int, minute: Int): String {
         return dataConverters.formatTimeToString(hour, minute)
+    }
+
+    fun calculateScrollOffset(listState: LazyListState): Int {
+        val layoutInfo = listState.layoutInfo
+        val visibleItemsInfo = layoutInfo.visibleItemsInfo
+        val selectedItemInfo = visibleItemsInfo.find { it.index == listState.firstVisibleItemIndex }
+
+        return if (selectedItemInfo != null) {
+            val parentCenter = layoutInfo.viewportEndOffset / 2
+            val itemCenter = selectedItemInfo.offset + (selectedItemInfo.size / 2)
+            parentCenter - itemCenter
+        } else {
+            0
+        }
+    }
+
+    fun generateDaysInMonth(yearMonth: YearMonth): List<LocalDate> {
+        return (1..yearMonth.lengthOfMonth()).map { day ->
+            yearMonth.atDay(day)
+        }
+    }
+
+    fun changeMonth(isNext: Boolean) {
+        (_uiState.value as? TaskListUIState.Success)?.apply {
+            val resultMonth = if (isNext) yearMonth.plusMonths(1) else yearMonth.minusMonths(1)
+            _uiState.value = copy(yearMonth = resultMonth)
+        }
     }
 
     fun logOut() {
