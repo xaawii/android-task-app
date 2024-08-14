@@ -10,7 +10,8 @@ sealed class TaskListUIState {
     data class Success(
         val tasks: List<TaskUIModel> = emptyList(),
         val selectedDate: LocalDate = LocalDate.now(),
-        val yearMonth: YearMonth = YearMonth.now()
+        val yearMonth: YearMonth = YearMonth.now(),
+        val userName: String,
     ) : TaskListUIState()
 
     data class Error(val message: UiText) : TaskListUIState()

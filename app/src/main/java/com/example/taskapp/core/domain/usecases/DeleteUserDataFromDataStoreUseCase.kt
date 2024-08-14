@@ -9,5 +9,6 @@ class DeleteUserDataFromDataStoreUseCase @Inject constructor(private val dataSto
         dataStoreManager.saveToken("")
         dataStoreManager.saveUserEmail("")
         dataStoreManager.saveUserId(0)
+        dataStoreManager.saveUserName("")
     }
 }

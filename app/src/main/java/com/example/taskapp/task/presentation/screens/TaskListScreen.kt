@@ -13,16 +13,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -36,9 +40,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -55,6 +63,7 @@ import com.example.taskapp.core.presentation.components.SwipeToDeleteContainer
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.components.SingleRowCalendarWithHorizontalScroll
+import com.example.taskapp.task.presentation.model.MenuOption
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
@@ -132,7 +141,7 @@ private fun MainBody(
 
 
     Scaffold(
-        topBar = { MyTopAppBar(onLogOut = taskListViewModel::logOut) },
+        topBar = { MyTopAppBar(taskListViewModel) },
         floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
@@ -146,7 +155,7 @@ private fun MainBody(
 
             ) {
 
-                WelcomeUserHeader()
+                WelcomeUserHeader(userName = uiState.userName)
                 Spacer(modifier = Modifier.height(32.dp))
                 SingleRowCalendarWithHorizontalScroll(
                     selectedDate = uiState.selectedDate,
@@ -181,18 +190,55 @@ private fun MainBody(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar(onLogOut: () -> Unit) {
+fun MyTopAppBar(taskListViewModel: TaskListViewModel) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    val menuList = listOf(
+        MenuOption(
+            "Log Out",
+            Icons.AutoMirrored.Rounded.Logout
+        ) { taskListViewModel.logOut() })
+
     TopAppBar(
         title = { Text(text = "") },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent
         ),
         actions = {
-            IconButton(onClick = onLogOut) {
+            IconButton(onClick = { expanded = true }) {
                 Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "options")
             }
+            PopUpMenuList(expanded = expanded, items = menuList, onDismiss = { expanded = false })
         })
 
+
+}
+
+@Composable
+fun PopUpMenuList(expanded: Boolean, items: List<MenuOption>, onDismiss: () -> Unit) {
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+        modifier = Modifier.clip(RoundedCornerShape(50.dp))
+    ) {
+        items.forEach { item ->
+            DropdownMenuItem(
+                onClick = {
+                    item.onClick()
+                    onDismiss()
+                },
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = item.icon, contentDescription = item.name)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(item.name)
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -226,7 +272,7 @@ private fun CardTaskBody(
 }
 
 @Composable
-private fun WelcomeUserHeader() {
+private fun WelcomeUserHeader(userName: String) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -235,7 +281,7 @@ private fun WelcomeUserHeader() {
         Text(text = stringResource(R.string.hello), style = MaterialTheme.typography.bodyLarge)
         Text(
             modifier = Modifier.padding(start = 8.dp),
-            text = "Xavi",
+            text = userName,
             style = MaterialTheme.typography.titleMedium
         )
     }

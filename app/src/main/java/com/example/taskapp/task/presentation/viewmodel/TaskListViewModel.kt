@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCase
+import com.example.taskapp.core.domain.usecases.GetUserNameFromDataStoreUseCase
 import com.example.taskapp.core.domain.validator.Result
 import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.core.utils.DataConverters
@@ -31,6 +32,7 @@ class TaskListViewModel @Inject constructor(
     private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase,
     private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
+    private val getUserNameFromDataStoreUseCase: GetUserNameFromDataStoreUseCase,
     private val dataConverters: DataConverters
 ) : ViewModel() {
 
@@ -55,7 +57,8 @@ class TaskListViewModel @Inject constructor(
                 is Result.Success -> {
                     taskList =
                         taskUIModelMapper.fromDomainListToUIList(result.data).toMutableList()
-                    _uiState.value = TaskListUIState.Success()
+                    _uiState.value =
+                        TaskListUIState.Success(userName = getUserNameFromDataStoreUseCase())
                     filterTasksBySelectedDay()
                 }
             }
