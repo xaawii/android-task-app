@@ -117,7 +117,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
 
         //password
         PasswordTextField(
-            text = uiState.password,
+            value = uiState.password,
             label = "Password",
             onValueChange = registerViewModel::onPasswordChanged
         )
@@ -126,7 +126,7 @@ private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: Regist
 
         //confirm password
         PasswordTextField(
-            text = uiState.confirmPassword,
+            value = uiState.confirmPassword,
             label = "Confirm password",
             onValueChange = registerViewModel::onConfirmPasswordChanged
         )
