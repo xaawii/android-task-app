@@ -27,6 +27,7 @@ import com.example.taskapp.auth.presentation.components.PasswordTextField
 import com.example.taskapp.auth.presentation.state.RegisterUIState
 import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -38,6 +39,10 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
 
     LaunchedEffect(Unit) {
+        registerViewModel.resetState()
+    }
+
+    LaunchedEffect(Unit) {
         registerViewModel.errorEvent.collectLatest {
             Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
         }
@@ -46,8 +51,9 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
     LaunchedEffect(Unit) {
         registerViewModel.registeredEvent.collectLatest {
             Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
-            navigationController.popBackStack()
-            registerViewModel.resetState()
+            navigationController.navigate(Routes.LoginScreen) {
+                popUpTo(Routes.RegisterScreen) { inclusive = true }
+            }
         }
     }
 

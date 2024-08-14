@@ -33,6 +33,10 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
 
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        loginViewModel.resetState()
+    }
+
     LaunchedEffect(key1 = loginViewModel.loginErrorEvent) {
         loginViewModel.loginErrorEvent.collectLatest {
             Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
@@ -69,7 +73,6 @@ fun LoginScreen(loginViewModel: LoginViewModel, navigationController: NavHostCon
             navigationController.navigate(Routes.TasksListScreen) {
                 popUpTo(Routes.LoginScreen) { inclusive = true }
             }
-            loginViewModel.resetState()
         }
     }
 }

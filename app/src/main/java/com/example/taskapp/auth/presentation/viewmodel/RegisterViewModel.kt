@@ -115,6 +115,7 @@ class RegisterViewModel @Inject constructor(
                 changePasswordIsValid(true)
             }
         }
+        checkPasswordMatches()
     }
 
     private fun handlePasswordError(error: UserDataValidator.PasswordError) {
@@ -137,6 +138,12 @@ class RegisterViewModel @Inject constructor(
     private fun changePasswordIsValid(value: Boolean) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(passwordIsValid = value)
+        }
+    }
+
+    private fun checkPasswordMatches() {
+        (_uiState.value as? RegisterUIState.Editing)?.apply {
+            _uiState.value = copy(passwordMatch = password == confirmPassword)
         }
     }
 
@@ -202,6 +209,7 @@ class RegisterViewModel @Inject constructor(
     private fun checkFormIsValid() {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             val formValid = emailIsValid && nameIsValid && passwordIsValid && passwordMatch
+            println("Form valid: ${emailIsValid}, ${nameIsValid},${passwordIsValid},${passwordMatch},")
             _uiState.value = copy(formIsValid = formValid)
         }
     }

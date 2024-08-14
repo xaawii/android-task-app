@@ -8,5 +8,6 @@ class SaveUserDataUseCase @Inject constructor(private val dataStoreManager: Data
     suspend operator fun invoke(userModel: UserModel) {
         dataStoreManager.saveUserId(userModel.id)
         dataStoreManager.saveUserEmail(userModel.email)
+        dataStoreManager.saveUserName(userModel.name)
     }
 }

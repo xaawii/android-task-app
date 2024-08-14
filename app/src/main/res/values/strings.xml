@@ -12,4 +12,10 @@
     <string name="error_not_found">Error: Not Found</string>
     <string name="error_forbidden">Error: Forbidden</string>
     <string name="error_unauthorized">Error: Unauthorized</string>
+    <string name="no_tasks_this_day">No tasks for this day</string>
+    <string name="hello">Hello</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="task_status_updated">Task status updated</string>
+    <string name="failed_to_update_tasks_status">Failed to update tasks status</string>
+    <string name="failed_to_delete_task">Failed to delete task</string>
 </resources>
