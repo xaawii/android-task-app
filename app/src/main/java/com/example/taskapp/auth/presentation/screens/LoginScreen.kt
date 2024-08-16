@@ -129,39 +129,45 @@ private fun LoginBody(
         )
         Spacer(modifier = Modifier.height(32.dp))
 
-        MyFormTextField(
-            label = stringResource(R.string.email),
-            value = uiState.email,
-            keyboardType = KeyboardType.Email,
-            onValueChange = loginViewModel::onEmailChanged
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        PasswordTextField(
-            value = uiState.password,
-            label = stringResource(R.string.password),
-            onValueChange = loginViewModel::onPasswordChanged
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = loginViewModel::login,
-            enabled = uiState.formIsValid
-        ) {
-            Text(
-                text = stringResource(R.string.sign_in),
-                style = MaterialTheme.typography.bodyMedium
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues = contentPadding)
+            .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            MyFormTextField(
+                label = stringResource(R.string.email),
+                value = uiState.email,
+                keyboardType = KeyboardType.Email,
+                onValueChange = loginViewModel::onEmailChanged
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PasswordTextField(
+                value = uiState.password,
+                label = stringResource(R.string.password),
+                onValueChange = loginViewModel::onPasswordChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = loginViewModel::login,
+                enabled = uiState.formIsValid
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_in),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .weight(1f),
+                .padding(16.dp),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
         ) {

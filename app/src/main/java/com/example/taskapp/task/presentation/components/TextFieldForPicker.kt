@@ -1,0 +1,59 @@
+package com.example.taskapp.task.presentation.components
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun TextFieldForPicker(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        TextField(
+            modifier = modifier
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent
+            ),
+            value = value,
+            onValueChange = {},
+            label = { Text(label, textAlign = TextAlign.Start) },
+            maxLines = 1,
+            singleLine = true,
+            readOnly = true,
+            leadingIcon = {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "valid",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+            }
+        )
+
+
+    }
+}

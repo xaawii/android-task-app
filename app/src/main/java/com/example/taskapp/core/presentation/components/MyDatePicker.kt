@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.taskapp.task.presentation.components.TextFieldForPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,33 +40,10 @@ fun MyDatePicker(
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        OutlinedTextField(
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent
-            ),
-            value = selectedDate,
-            onValueChange = { },
-            label = { Text("Pick a due date") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                    Icon(
-                        imageVector = Icons.Rounded.CalendarMonth,
-                        contentDescription = "Select date"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        // Superposición invisible para capturar clics
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(Color.Transparent)
-                .clickable { showDatePicker = !showDatePicker }
-        )
+
+        TextFieldForPicker(modifier = Modifier.clickable { showDatePicker = !showDatePicker }, label = "Due date", value = selectedDate, icon = Icons.Rounded.CalendarMonth) {
+            showDatePicker = !showDatePicker
+        }
 
         if (showDatePicker) {
             DatePickerDialog(

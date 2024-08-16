@@ -101,8 +101,9 @@ private fun MainBody(
     CircleBackground(color = MaterialTheme.colorScheme.primary) {
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { TopAppBarBack(onBackPressed = navigationController::popBackStack) },
+            topBar = { TopAppBarBack(title = stringResource(R.string.create_an_account), onBackPressed = navigationController::popBackStack) },
         ) { contentPadding ->
+
 
             RegisterBody(contentPadding, uiState, registerViewModel)
 
@@ -128,68 +129,68 @@ private fun RegisterBody(
     ) {
 
 
-        Text(
-            text = stringResource(R.string.create_an_account),
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.titleLarge,
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp)
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-
-        //email
-        MyFormTextField(
-            label = stringResource(R.string.email),
-            value = uiState.email,
-            isValid = uiState.emailIsValid,
-            errorMessage = uiState.emailError,
-            keyboardType = KeyboardType.Email,
-            onValueChange = registerViewModel::onEmailChanged
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        //name
-        MyFormTextField(
-            label = stringResource(R.string.name),
-            value = uiState.name,
-            isValid = uiState.nameIsValid,
-            errorMessage = uiState.nameError,
-            keyboardType = KeyboardType.Text,
-            onValueChange = registerViewModel::onNameChanged
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        //password
-        PasswordTextField(
-            value = uiState.password,
-            label = stringResource(R.string.password),
-            isValid = uiState.passwordIsValid,
-            errorMessage = uiState.passwordError,
-            onValueChange = registerViewModel::onPasswordChanged
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        //confirm password
-        PasswordTextField(
-            value = uiState.confirmPassword,
-            label = stringResource(R.string.confirm_password),
-            isValid = uiState.passwordMatch,
-            onValueChange = registerViewModel::onConfirmPasswordChanged
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = registerViewModel::register,
-            enabled = uiState.formIsValid
+                .fillMaxSize()
+                .padding(paddingValues)
+                .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(R.string.sign_up),
-                style = MaterialTheme.typography.bodyMedium
+            //email
+            MyFormTextField(
+                label = stringResource(R.string.email),
+                value = uiState.email,
+                isValid = uiState.emailIsValid,
+                errorMessage = uiState.emailError,
+                keyboardType = KeyboardType.Email,
+                onValueChange = registerViewModel::onEmailChanged
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            //name
+            MyFormTextField(
+                label = stringResource(R.string.name),
+                value = uiState.name,
+                isValid = uiState.nameIsValid,
+                errorMessage = uiState.nameError,
+                keyboardType = KeyboardType.Text,
+                onValueChange = registerViewModel::onNameChanged
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            //password
+            PasswordTextField(
+                value = uiState.password,
+                label = stringResource(R.string.password),
+                isValid = uiState.passwordIsValid,
+                errorMessage = uiState.passwordError,
+                onValueChange = registerViewModel::onPasswordChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            //confirm password
+            PasswordTextField(
+                value = uiState.confirmPassword,
+                label = stringResource(R.string.confirm_password),
+                isValid = uiState.passwordMatch,
+                onValueChange = registerViewModel::onConfirmPasswordChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = registerViewModel::register,
+                enabled = uiState.formIsValid
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_up),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }

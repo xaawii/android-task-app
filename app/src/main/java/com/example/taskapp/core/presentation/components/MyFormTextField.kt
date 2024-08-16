@@ -30,11 +30,13 @@ fun MyFormTextField(
     keyboardType: KeyboardType,
     onValueChange: (String) -> Unit
 ) {
-    Column {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
         TextField(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent

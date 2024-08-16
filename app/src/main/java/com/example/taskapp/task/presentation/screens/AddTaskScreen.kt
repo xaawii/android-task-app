@@ -1,5 +1,6 @@
 package com.example.taskapp.task.presentation.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +12,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -112,7 +113,9 @@ private fun MainBody(
                 title = title, onBackPressed = navigationController::popBackStack
             )
         }) { contentPadding ->
+
             FormBody(contentPadding, uiState, addTaskViewModel)
+
         }
     }
 
@@ -129,7 +132,9 @@ private fun FormBody(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
         //title
@@ -144,8 +149,10 @@ private fun FormBody(
         //description
         MyFormTextField(
             modifier = Modifier.height(50.dp),
-            label = "Description",
+            label = stringResource(R.string.description),
             value = uiState.description,
+            singleLine = false,
+            maxLines = 20,
             keyboardType = KeyboardType.Text,
             onValueChange = addTaskViewModel::onDescriptionChanged
         )
@@ -178,8 +185,19 @@ private fun FormBody(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        TextButton(onClick = addTaskViewModel::onButtonPressed, enabled = uiState.formIsValid) {
-            Text("Create")
+        Button(
+            onClick = addTaskViewModel::onButtonPressed,
+            enabled = uiState.formIsValid
+        ) {
+            val text = if (uiState.mode == "update") {
+                stringResource(R.string.update)
+            } else stringResource(
+                R.string.create
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
