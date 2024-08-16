@@ -9,15 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,19 +22,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
+import com.example.taskapp.R
 import com.example.taskapp.auth.presentation.components.PasswordTextField
 import com.example.taskapp.auth.presentation.state.LoginUIState
 import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
 import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.components.MyFormTextField
 import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -124,8 +121,7 @@ private fun LoginBody(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Log In\n To Start!",
-            textAlign = TextAlign.Start,
+            text = stringResource(R.string.log_in_to_start),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
@@ -133,8 +129,8 @@ private fun LoginBody(
         )
         Spacer(modifier = Modifier.height(32.dp))
 
-        MyLoginTextField(
-            label = "Email",
+        MyFormTextField(
+            label = stringResource(R.string.email),
             value = uiState.email,
             keyboardType = KeyboardType.Email,
             onValueChange = loginViewModel::onEmailChanged
@@ -144,7 +140,7 @@ private fun LoginBody(
 
         PasswordTextField(
             value = uiState.password,
-            label = "Password",
+            label = stringResource(R.string.password),
             onValueChange = loginViewModel::onPasswordChanged
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -153,7 +149,10 @@ private fun LoginBody(
             onClick = loginViewModel::login,
             enabled = uiState.formIsValid
         ) {
-            Text(text = "Sign In", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = stringResource(R.string.sign_in),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -166,11 +165,17 @@ private fun LoginBody(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
         ) {
-            Text(text = "Don't have an account?", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = stringResource(R.string.don_t_have_an_account),
+                style = MaterialTheme.typography.bodySmall
+            )
             TextButton(
                 onClick = { navigationController.navigate(Routes.RegisterScreen) }
             ) {
-                Text(text = "Sign Up", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(R.string.sign_up),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
 
@@ -178,26 +183,3 @@ private fun LoginBody(
     }
 }
 
-@Composable
-private fun MyLoginTextField(
-    label: String,
-    value: String,
-    keyboardType: KeyboardType,
-    onValueChange: (String) -> Unit
-) {
-    TextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent
-        ),
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        maxLines = 1,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-    )
-}

@@ -1,32 +1,42 @@
 package com.example.taskapp.auth.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
+import com.example.taskapp.R
 import com.example.taskapp.auth.presentation.components.PasswordTextField
 import com.example.taskapp.auth.presentation.state.RegisterUIState
 import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
+import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.components.MyFormTextField
+import com.example.taskapp.core.presentation.components.TopAppBarBack
 import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -69,7 +79,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     when (uiState) {
         is RegisterUIState.Editing -> {
-            MainBody(uiState as RegisterUIState.Editing, registerViewModel)
+            MainBody(uiState as RegisterUIState.Editing, registerViewModel, navigationController)
         }
 
         is RegisterUIState.Error -> {
@@ -83,57 +93,103 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 }
 
 @Composable
-private fun MainBody(uiState: RegisterUIState.Editing, registerViewModel: RegisterViewModel) {
+private fun MainBody(
+    uiState: RegisterUIState.Editing,
+    registerViewModel: RegisterViewModel,
+    navigationController: NavHostController
+) {
+    CircleBackground(color = MaterialTheme.colorScheme.primary) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = { TopAppBarBack(onBackPressed = navigationController::popBackStack) },
+        ) { contentPadding ->
+
+            RegisterBody(contentPadding, uiState, registerViewModel)
+
+
+        }
+    }
+
+}
+
+
+@Composable
+private fun RegisterBody(
+    paddingValues: PaddingValues,
+    uiState: RegisterUIState.Editing,
+    registerViewModel: RegisterViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
-        //email
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.email,
-            onValueChange = registerViewModel::onEmailChanged,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            label = { Text("Email") },
-            maxLines = 1,
-            singleLine = true
+
+        Text(
+            text = stringResource(R.string.create_an_account),
+            textAlign = TextAlign.Start,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp)
         )
-        if (uiState.emailError.isNotBlank()) Text(text = uiState.emailError)
+        Spacer(modifier = Modifier.height(32.dp))
+
+        //email
+        MyFormTextField(
+            label = stringResource(R.string.email),
+            value = uiState.email,
+            isValid = uiState.emailIsValid,
+            errorMessage = uiState.emailError,
+            keyboardType = KeyboardType.Email,
+            onValueChange = registerViewModel::onEmailChanged
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         //name
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
+        MyFormTextField(
+            label = stringResource(R.string.name),
             value = uiState.name,
-            onValueChange = registerViewModel::onNameChanged,
-            label = { Text("Name") },
-            maxLines = 1,
-            singleLine = true
+            isValid = uiState.nameIsValid,
+            errorMessage = uiState.nameError,
+            keyboardType = KeyboardType.Text,
+            onValueChange = registerViewModel::onNameChanged
         )
-        if (uiState.nameError.isNotBlank()) Text(text = uiState.nameError)
+
         Spacer(modifier = Modifier.height(16.dp))
+
 
         //password
         PasswordTextField(
             value = uiState.password,
-            label = "Password",
+            label = stringResource(R.string.password),
+            isValid = uiState.passwordIsValid,
+            errorMessage = uiState.passwordError,
             onValueChange = registerViewModel::onPasswordChanged
         )
-        if (uiState.passwordError.isNotBlank()) Text(text = uiState.passwordError)
         Spacer(modifier = Modifier.height(16.dp))
 
         //confirm password
         PasswordTextField(
             value = uiState.confirmPassword,
-            label = "Confirm password",
+            label = stringResource(R.string.confirm_password),
+            isValid = uiState.passwordMatch,
             onValueChange = registerViewModel::onConfirmPasswordChanged
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = registerViewModel::register, enabled = uiState.formIsValid) {
-            Text(text = "Sign Up")
+        Button(
+            onClick = registerViewModel::register,
+            enabled = uiState.formIsValid
+        ) {
+            Text(
+                text = stringResource(R.string.sign_up),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
