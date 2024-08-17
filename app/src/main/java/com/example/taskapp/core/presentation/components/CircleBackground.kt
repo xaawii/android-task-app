@@ -8,17 +8,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CircleBackground(color: Color, contentOver: @Composable () -> Unit) {
+fun CircleBackground(color: Color, size: Dp = 600.dp, contentOver: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         Canvas(
             modifier = Modifier
-                .size(600.dp)
+                .size(size)
                 .offset((-100).dp, (-350).dp)
         ) {
             drawCircle(color = color)

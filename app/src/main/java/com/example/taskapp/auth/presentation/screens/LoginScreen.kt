@@ -1,30 +1,41 @@
 package com.example.taskapp.auth.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
+import com.example.taskapp.R
+import com.example.taskapp.auth.presentation.components.PasswordTextField
 import com.example.taskapp.auth.presentation.state.LoginUIState
 import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
+import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.components.MyFormTextField
 import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -83,42 +94,98 @@ private fun MainBody(
     loginViewModel: LoginViewModel,
     navigationController: NavHostController
 ) {
+
+    CircleBackground(color = MaterialTheme.colorScheme.primary) {
+        Scaffold(containerColor = Color.Transparent) { contentPadding ->
+
+            LoginBody(contentPadding, uiState, loginViewModel, navigationController)
+
+
+        }
+    }
+
+}
+
+@Composable
+private fun LoginBody(
+    contentPadding: PaddingValues,
+    uiState: LoginUIState.Editing,
+    loginViewModel: LoginViewModel,
+    navigationController: NavHostController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(paddingValues = contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.email,
-            onValueChange = loginViewModel::onEmailChanged,
-            label = { Text("Email") },
-            maxLines = 1
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
+        Text(
+            text = stringResource(R.string.log_in_to_start),
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            value = uiState.password,
-            onValueChange = loginViewModel::onPasswordChanged,
-            label = { Text("Password") }
+                .padding(start = 16.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        TextButton(
-            onClick = loginViewModel::login,
-            enabled = uiState.formIsValid
-        ) {
-            Text(text = "Sign In")
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues = contentPadding)
+            .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            MyFormTextField(
+                label = stringResource(R.string.email),
+                value = uiState.email,
+                keyboardType = KeyboardType.Email,
+                onValueChange = loginViewModel::onEmailChanged
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PasswordTextField(
+                value = uiState.password,
+                label = stringResource(R.string.password),
+                onValueChange = loginViewModel::onPasswordChanged
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = loginViewModel::login,
+                enabled = uiState.formIsValid
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_in),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(
-            onClick = { navigationController.navigate(Routes.RegisterScreen) }
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
         ) {
-            Text(text = "Don't have an account? Sign Up")
+            Text(
+                text = stringResource(R.string.don_t_have_an_account),
+                style = MaterialTheme.typography.bodySmall
+            )
+            TextButton(
+                onClick = { navigationController.navigate(Routes.RegisterScreen) }
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_up),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
+
+
     }
 }
+
