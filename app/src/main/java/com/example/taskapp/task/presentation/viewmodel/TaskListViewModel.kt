@@ -7,7 +7,6 @@ import com.example.taskapp.core.domain.usecases.DeleteUserDataFromDataStoreUseCa
 import com.example.taskapp.core.domain.usecases.GetUserNameFromDataStoreUseCase
 import com.example.taskapp.core.domain.validator.Result
 import com.example.taskapp.core.presentation.utils.asUiText
-import com.example.taskapp.core.utils.DataConverters
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
 import com.example.taskapp.task.domain.usecases.GetAllTasksByUserIdUseCase
@@ -32,8 +31,7 @@ class TaskListViewModel @Inject constructor(
     private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase,
     private val deleteUserDataFromDataStoreUseCase: DeleteUserDataFromDataStoreUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
-    private val getUserNameFromDataStoreUseCase: GetUserNameFromDataStoreUseCase,
-    private val dataConverters: DataConverters
+    private val getUserNameFromDataStoreUseCase: GetUserNameFromDataStoreUseCase
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow<TaskListUIState>(TaskListUIState.Loading)
@@ -113,7 +111,7 @@ class TaskListViewModel @Inject constructor(
                 val updatedTask = taskList[taskIndex].copy(status = status)
                 taskList[taskIndex] = updatedTask
 
-                when (val result =
+                when (
                     updateTaskUseCase(taskUIModelMapper.fromUItoDomain(updatedTask))) {
                     is Result.Error -> _taskStatusEvent.emit(false)
 
@@ -127,9 +125,6 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
-    fun formatTimeToString(hour: Int, minute: Int): String {
-        return dataConverters.formatTimeToString(hour, minute)
-    }
 
     fun calculateScrollOffset(listState: LazyListState): Int {
         val layoutInfo = listState.layoutInfo

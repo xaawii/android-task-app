@@ -9,7 +9,6 @@ import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
 import com.example.taskapp.task.domain.usecases.GetTaskById
 import com.example.taskapp.task.domain.usecases.UpdateTaskUseCase
 import com.example.taskapp.task.mappers.TaskUIModelMapper
-import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.DetailUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,8 +54,7 @@ class DetailViewModel @Inject constructor(
 
                 val task = task.copy(status = taskStatus)
 
-                when (val result =
-                    updateTaskUseCase(taskUIModelMapper.fromUItoDomain(task))) {
+                when (updateTaskUseCase(taskUIModelMapper.fromUItoDomain(task))) {
                     is Result.Error -> _taskStatusEvent.emit(false)
 
                     is Result.Success -> {
@@ -71,10 +69,10 @@ class DetailViewModel @Inject constructor(
     }
 
 
-    fun deleteTask(taskUIModel: TaskUIModel) {
+    fun deleteTask() {
         viewModelScope.launch {
             (_uiState.value as? DetailUIState.Success)?.apply {
-                when (deleteTaskByIdUseCase(taskUIModel.id)) {
+                when (deleteTaskByIdUseCase(task.id)) {
                     is Result.Error -> _taskDeletedEvent.emit(false)
                     is Result.Success -> {
                         _taskDeletedEvent.emit(true)

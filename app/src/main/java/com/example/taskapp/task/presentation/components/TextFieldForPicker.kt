@@ -33,13 +33,10 @@ fun TextFieldForPicker(
     ) {
         TextField(
             modifier = Modifier
-                .fillMaxWidth()
                 .clickable { onClick() },
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent
+                focusedContainerColor = Color.Transparent
             ),
             value = value,
             onValueChange = {},

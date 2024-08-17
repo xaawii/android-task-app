@@ -72,7 +72,7 @@ import com.example.taskapp.ui.theme.BlueLight
 import com.example.taskapp.ui.theme.Green
 import com.example.taskapp.ui.theme.Lavender
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHostController) {
@@ -216,7 +216,8 @@ private fun TaskLazyList(
     LazyColumn(
         Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)) {
+            .padding(horizontal = 16.dp)
+    ) {
         items(uiState.tasks, key = { it.id }) {
             ItemTask(
                 Modifier
@@ -239,7 +240,7 @@ private fun TaskLazyList(
 @Composable
 private fun NoTaskText() {
 
-    Box (Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             text = stringResource(R.string.no_tasks_this_day),
             textAlign = TextAlign.Center,
@@ -348,12 +349,6 @@ fun ItemTask(
         TaskCard(
             modifier = modifier,
             taskModel = taskModel,
-            formatDate = {
-                taskListViewModel.formatTimeToString(
-                    hour = it.hour,
-                    minute = it.minute
-                )
-            },
             onCheckedChange = taskListViewModel::updateTaskStatus
         )
     }
@@ -363,7 +358,6 @@ fun ItemTask(
 private fun TaskCard(
     modifier: Modifier,
     taskModel: TaskUIModel,
-    formatDate: (LocalDateTime) -> String,
     onCheckedChange: (Boolean, Long) -> Unit
 ) {
 
@@ -393,13 +387,14 @@ private fun TaskCard(
 
                 Row {
                     Text(
-                        text = formatDate(taskModel.dueDate), modifier = Modifier
+                        text = taskModel.dueDate.toLocalTime()
+                            .format(DateTimeFormatter.ofPattern("HH:mm")), modifier = Modifier
                             .padding(horizontal = 8.dp),
                         style = MaterialTheme.typography.bodySmall
                     )
                     Text(text = "·", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = taskModel.status.name, modifier = Modifier
+                        text = taskModel.status.name.replace("_"," "), modifier = Modifier
                             .padding(horizontal = 8.dp),
                         style = MaterialTheme.typography.bodySmall
                     )

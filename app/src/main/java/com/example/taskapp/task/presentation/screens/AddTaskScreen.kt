@@ -38,6 +38,9 @@ import com.example.taskapp.core.presentation.components.TopAppBarBack
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.state.AddTaskUIState
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -159,24 +162,27 @@ private fun FormBody(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Selector de fecha
-        MyDatePicker(uiState.dueDate) { datePickerState ->
-            addTaskViewModel.onDueDateChanged(datePickerState.selectedDateMillis?.let {
-                addTaskViewModel.formatMillisToDateString(it)
-            } ?: "")
+        MyDatePicker(uiState.dueDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) { datePickerState ->
+            datePickerState.selectedDateMillis?.let {
+                addTaskViewModel.onDueDateChanged(
+                    LocalDate.ofEpochDay(it)
+                )
+            }
+
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         //Selector hora
         MyTimePicker(
-            selectedTime = uiState.dueTime
-        ) { addTaskViewModel.onDueTimeChanged(it.hour, it.minute) }
+            selectedTime = uiState.dueTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        ) { addTaskViewModel.onDueTimeChanged(LocalTime.of(it.hour, it.minute)) }
         Spacer(modifier = Modifier.height(16.dp))
 
         if (uiState.mode == "update") {
             // Spinner
             MyDropDownMenu(
                 items = TaskStatus.entries,
-                selectedItem = uiState.taskStatus.name,
+                selectedItem = uiState.taskStatus.name.replace("_"," "),
                 onSelected = addTaskViewModel::onTaskStatusChanged,
                 label = "Select task status"
             ) {
