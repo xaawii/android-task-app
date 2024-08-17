@@ -16,7 +16,12 @@ sealed class Routes {
     object TasksListScreen
 
     @Serializable
-    data class AddTask(
+    data class AddTaskScreen(
         val id: Long?
+    )
+
+    @Serializable
+    data class DetailScreen(
+        val id: Long
     )
 }

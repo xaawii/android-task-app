@@ -21,8 +21,10 @@ import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
 import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.screens.AddTaskScreen
+import com.example.taskapp.task.presentation.screens.DetailScreen
 import com.example.taskapp.task.presentation.screens.TaskScreen
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
+import com.example.taskapp.task.presentation.viewmodel.DetailViewModel
 import com.example.taskapp.task.presentation.viewmodel.TaskListViewModel
 import com.example.taskapp.ui.theme.NewAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,14 +37,17 @@ class MainActivity : ComponentActivity() {
     private val taskListViewModel: TaskListViewModel by viewModels()
     private val addTaskViewModel: AddTaskViewModel by viewModels()
     private val registerViewModel: RegisterViewModel by viewModels()
+    private val detailViewModel: DetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             NewAppTheme {
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     val navigationController = rememberNavController()
 
 
@@ -73,12 +78,21 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable<Routes.AddTask> {
-                            val args = it.toRoute<Routes.AddTask>()
+                        composable<Routes.AddTaskScreen> {
+                            val args = it.toRoute<Routes.AddTaskScreen>()
                             AddTaskScreen(
                                 navigationController = navigationController,
                                 addTaskViewModel,
                                 taskId = args.id ?: 0L
+                            )
+                        }
+
+                        composable<Routes.DetailScreen> {
+                            val args = it.toRoute<Routes.DetailScreen>()
+                            DetailScreen(
+                                detailViewModel,
+                                navigationController,
+                                taskId = args.id
                             )
                         }
 

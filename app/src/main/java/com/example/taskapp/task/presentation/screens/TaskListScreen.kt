@@ -167,7 +167,7 @@ private fun MainBody(
     CircleBackground(color = MaterialTheme.colorScheme.primary) {
         Scaffold(
             topBar = { MyTopAppBar(uiState.userName, taskListViewModel) },
-            floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTask(0L)) } },
+            floatingActionButton = { MyFAB { navigationController.navigate(Routes.AddTaskScreen(0L)) } },
             floatingActionButtonPosition = FabPosition.End,
             containerColor = Color.Transparent
         ) { contentPadding ->
@@ -228,7 +228,7 @@ private fun TaskLazyList(
                             stiffness = Spring.StiffnessLow
                         )
                     )
-                    .clickable { navigationController.navigate(Routes.AddTask(id = it.id)) },
+                    .clickable { navigationController.navigate(Routes.DetailScreen(id = it.id)) },
                 taskModel = it, taskListViewModel = taskListViewModel
             )
 
