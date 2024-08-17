@@ -148,7 +148,7 @@ private fun FormBody(
 
         //description
         MyFormTextField(
-            modifier = Modifier.height(50.dp),
+            modifier = Modifier.height(150.dp),
             label = stringResource(R.string.description),
             value = uiState.description,
             singleLine = false,

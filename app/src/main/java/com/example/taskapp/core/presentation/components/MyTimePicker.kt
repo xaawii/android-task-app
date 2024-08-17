@@ -1,6 +1,5 @@
 package com.example.taskapp.core.presentation.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -28,7 +27,6 @@ fun MyTimePicker(
     ) {
 
         TextFieldForPicker(
-            modifier = Modifier.clickable { showTimePicker = !showTimePicker },
             label = "Due time",
             value = selectedTime,
             icon = Icons.Rounded.AccessTime

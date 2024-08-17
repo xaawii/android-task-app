@@ -1,6 +1,8 @@
 package com.example.taskapp.task.presentation.components
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -18,23 +20,26 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextFieldForPicker(
-    modifier: Modifier = Modifier,
     label: String,
     value: String,
     icon: ImageVector,
     onClick: () -> Unit
 ) {
-    Column(
+    Box(
         Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clickable { onClick() }
     ) {
         TextField(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent
+                focusedContainerColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
             ),
             value = value,
             onValueChange = {},
@@ -52,6 +57,14 @@ fun TextFieldForPicker(
                 }
 
             }
+        )
+
+        // Superposición invisible para capturar clics
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color.Transparent)
+                .clickable { onClick() }
         )
 
 
