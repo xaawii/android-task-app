@@ -41,4 +41,12 @@
     <string name="an_error_has_occurred">Ha habido un problema</string>
     <string name="due_date">Fecha límite</string>
     <string name="due_time">Hora límite</string>
+    <string name="account_created">Cuenta creada</string>
+    <string name="delete_task">Borrar tarea</string>
+    <string name="are_you_sure_you_want_to_delete_this_task">¿Seguro que quieres eliminar esta tarea?</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="status_pending">Pendiente</string>
+    <string name="status_in_progress">En progreso</string>
+    <string name="status_completed">Completada</string>
 </resources>

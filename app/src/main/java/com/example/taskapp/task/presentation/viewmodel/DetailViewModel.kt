@@ -78,6 +78,7 @@ class DetailViewModel @Inject constructor(
                         _taskDeletedEvent.emit(false)
                         _uiState.value = copy()
                     }
+
                     is Result.Success -> {
                         _taskDeletedEvent.emit(true)
                         _uiState.value = DetailUIState.Deleted

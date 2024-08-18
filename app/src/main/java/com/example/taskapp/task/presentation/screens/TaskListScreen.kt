@@ -62,6 +62,7 @@ import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.SwipeToDeleteContainer
+import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.components.SingleRowCalendarWithHorizontalScroll
@@ -398,12 +399,12 @@ private fun TaskCard(
                     )
                     Text(text = "·", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = taskModel.status.name.replace("_", " "), modifier = Modifier
+                        text = taskModel.status.asUiText().asString(),
+                        modifier = Modifier
                             .padding(horizontal = 8.dp),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-
 
             }
 

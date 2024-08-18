@@ -4,6 +4,7 @@ package com.example.taskapp.core.presentation.utils
 import com.example.taskapp.R
 import com.example.taskapp.core.domain.validator.DataError
 import com.example.taskapp.core.domain.validator.Result
+import com.example.taskapp.task.domain.enum.TaskStatus
 
 fun DataError.asUiText(): UiText {
     return when (this) {
@@ -59,4 +60,20 @@ fun DataError.asUiText(): UiText {
 
 fun Result.Error<*, DataError>.asErrorUiText(): UiText {
     return error.asUiText()
+}
+
+fun TaskStatus.asUiText(): UiText {
+    return when (this) {
+        TaskStatus.PENDING -> UiText.StringResource(
+            R.string.status_pending
+        )
+
+        TaskStatus.IN_PROGRESS -> UiText.StringResource(
+            R.string.status_in_progress
+        )
+
+        TaskStatus.COMPLETED -> UiText.StringResource(
+            R.string.status_completed
+        )
+    }
 }
