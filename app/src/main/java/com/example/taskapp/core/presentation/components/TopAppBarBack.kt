@@ -11,16 +11,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarBack(
     title: String = "",
+    titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     onBackPressed: () -> Unit
 ) {
 
     TopAppBar(
-        title = { Text(text = title, style = MaterialTheme.typography.titleSmall) },
+        title = { Text(text = title, style = titleStyle) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent
         ),

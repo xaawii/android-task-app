@@ -59,6 +59,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.R
 import com.example.taskapp.core.presentation.components.CircleBackground
+import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.SwipeToDeleteContainer
 import com.example.taskapp.core.routes.Routes
@@ -131,7 +132,11 @@ fun TaskScreen(taskListViewModel: TaskListViewModel, navigationController: NavHo
 
     when (uiState) {
         is TaskListUIState.Error -> {
-            Text("Error: ${(uiState as TaskListUIState.Error).message.asString(context)}")
+            ErrorComponent(
+                text = "An error has occurred",
+                reload = taskListViewModel::getTasks,
+                hasBackButton = false,
+                onBackPressed = {})
         }
 
         TaskListUIState.Loading -> {
@@ -232,7 +237,6 @@ private fun TaskLazyList(
                     .clickable { navigationController.navigate(Routes.DetailScreen(id = it.id)) },
                 taskModel = it, taskListViewModel = taskListViewModel
             )
-
         }
     }
 }
@@ -258,7 +262,7 @@ fun MyTopAppBar(userName: String, taskListViewModel: TaskListViewModel) {
 
     val menuList = listOf(
         MenuOption(
-            "Log Out",
+            stringResource(R.string.log_out),
             Icons.AutoMirrored.Rounded.Logout
         ) { taskListViewModel.logOut() })
 
@@ -394,7 +398,7 @@ private fun TaskCard(
                     )
                     Text(text = "·", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = taskModel.status.name.replace("_"," "), modifier = Modifier
+                        text = taskModel.status.name.replace("_", " "), modifier = Modifier
                             .padding(horizontal = 8.dp),
                         style = MaterialTheme.typography.bodySmall
                     )

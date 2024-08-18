@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -101,7 +99,15 @@ private fun MainBody(
     CircleBackground(color = MaterialTheme.colorScheme.primary) {
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { TopAppBarBack(title = stringResource(R.string.create_an_account), onBackPressed = navigationController::popBackStack) },
+            topBar = {
+                TopAppBarBack(
+                    title = stringResource(
+                        R.string.create_an_account
+                    ),
+                    titleStyle = MaterialTheme.typography.titleLarge,
+                    onBackPressed = navigationController::popBackStack
+                )
+            },
         ) { contentPadding ->
 
 
@@ -127,7 +133,6 @@ private fun RegisterBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
 
 
         Column(

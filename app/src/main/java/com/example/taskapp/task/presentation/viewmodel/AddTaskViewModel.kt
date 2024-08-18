@@ -4,8 +4,8 @@ package com.example.taskapp.task.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskapp.core.domain.validator.Result
+import com.example.taskapp.core.presentation.utils.UiText
 import com.example.taskapp.core.presentation.utils.asUiText
-import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.domain.usecases.CreateTaskUseCase
 import com.example.taskapp.task.domain.usecases.GetTaskById
 import com.example.taskapp.task.domain.usecases.UpdateTaskUseCase
@@ -13,7 +13,9 @@ import com.example.taskapp.task.mappers.TaskUIModelMapper
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.AddTaskUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -31,6 +33,10 @@ class AddTaskViewModel @Inject constructor(
 
     private var _uiState = MutableStateFlow<AddTaskUIState>(AddTaskUIState.Loading)
     val uiState: StateFlow<AddTaskUIState> = _uiState
+
+    //event for error
+    private val _errorEvent = MutableSharedFlow<UiText>()
+    val errorEvent: SharedFlow<UiText> = _errorEvent
 
     fun getEmptyForm() {
         viewModelScope.launch {
@@ -83,8 +89,6 @@ class AddTaskViewModel @Inject constructor(
                     false
                 )
 
-                _uiState.value = AddTaskUIState.Loading
-
                 if (mode == "update") updateTask(task) else createTask(task)
 
             }
@@ -94,25 +98,41 @@ class AddTaskViewModel @Inject constructor(
     }
 
     private suspend fun createTask(task: TaskUIModel) {
-        when (val result = createTaskUseCase(taskUIModelMapper.fromUItoDomain(task))) {
-            is Result.Error -> _uiState.value =
-                AddTaskUIState.Error(result.error.asUiText())
+        (_uiState.value as? AddTaskUIState.Editing)?.apply {
 
-            is Result.Success -> _uiState.value = AddTaskUIState.Success("Task created")
+            _uiState.value = AddTaskUIState.Loading
+
+            when (val result = createTaskUseCase(taskUIModelMapper.fromUItoDomain(task))) {
+                is Result.Error -> {
+                    _errorEvent.emit(result.error.asUiText())
+                    _uiState.value = copy()
+                }
+
+                is Result.Success -> _uiState.value = AddTaskUIState.Created
+            }
         }
+
     }
 
     private suspend fun updateTask(task: TaskUIModel) {
-        when (val result = updateTaskUseCase(
-            taskUIModelMapper.fromUItoDomain(
-                task
-            )
-        )) {
-            is Result.Error -> _uiState.value =
-                AddTaskUIState.Error(result.error.asUiText())
+        (_uiState.value as? AddTaskUIState.Editing)?.apply {
 
-            is Result.Success -> _uiState.value = AddTaskUIState.Success("Task updated")
+            _uiState.value = AddTaskUIState.Loading
+
+            when (val result = updateTaskUseCase(
+                taskUIModelMapper.fromUItoDomain(
+                    task
+                )
+            )) {
+                is Result.Error -> {
+                    _errorEvent.emit(result.error.asUiText())
+                    _uiState.value = copy()
+                }
+
+                is Result.Success -> _uiState.value = AddTaskUIState.Updated
+            }
         }
+
     }
 
     fun onTitleChanged(title: String) {
@@ -141,12 +161,6 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
-    fun onTaskStatusChanged(taskStatus: TaskStatus) {
-        (_uiState.value as? AddTaskUIState.Editing)?.apply {
-            _uiState.value = copy(taskStatus = taskStatus)
-        }
-    }
-
 
     private fun checkFormIsValid() {
         (_uiState.value as? AddTaskUIState.Editing)?.apply {
@@ -154,8 +168,6 @@ class AddTaskViewModel @Inject constructor(
             _uiState.value = copy(formIsValid = formValid)
         }
     }
-
-
 
 
 }

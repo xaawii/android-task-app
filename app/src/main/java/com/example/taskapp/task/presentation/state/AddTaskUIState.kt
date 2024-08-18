@@ -7,7 +7,8 @@ import java.time.LocalTime
 
 sealed class AddTaskUIState {
     data object Loading : AddTaskUIState()
-    data class Success(val message: String) : AddTaskUIState()
+    data object Created : AddTaskUIState()
+    data object Updated : AddTaskUIState()
     data class Error(val message: UiText) : AddTaskUIState()
     data class Editing(
         val id: Long = 0,

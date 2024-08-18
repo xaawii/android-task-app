@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.taskapp.R
 import com.example.taskapp.task.presentation.components.TextFieldForPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +29,7 @@ fun MyTimePicker(
     ) {
 
         TextFieldForPicker(
-            label = "Due time",
+            label = stringResource(R.string.due_time),
             value = selectedTime,
             icon = Icons.Rounded.AccessTime
         ) {

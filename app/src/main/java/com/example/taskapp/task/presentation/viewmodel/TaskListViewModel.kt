@@ -52,6 +52,8 @@ class TaskListViewModel @Inject constructor(
     fun getTasks() {
         viewModelScope.launch {
 
+            _uiState.value = TaskListUIState.Loading
+
             when (val result = getAllTasksByUserIdUseCase()) {
                 is Result.Error -> _uiState.value =
                     TaskListUIState.Error(result.error.asUiText())

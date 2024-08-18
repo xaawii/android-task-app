@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TaskApp</string>
+    <string name="the_request_timed_out">La solicitud ha caducado</string>
+    <string name="youve_hit_your_rate_limit">Ha llegado al límite de peticiones</string>
+    <string name="no_internet">Sin internet</string>
+    <string name="file_too_large">Archivo demasiado pesado</string>
+    <string name="server_error">Error en el servidor</string>
+    <string name="error_serialization">Error de serialización</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="error_disk_full">Error: Disco lleno</string>
+    <string name="error_bad_request">Error: Solicitud incorrecta</string>
+    <string name="error_not_found">Error: No encontrado</string>
+    <string name="error_forbidden">Error: Prohibido</string>
+    <string name="error_unauthorized">Error: No autorizado</string>
+    <string name="no_tasks_this_day">No hay tareas para este día</string>
+    <string name="hello">Hola</string>
+    <string name="task_deleted">Tarea eliminada</string>
+    <string name="task_status_updated">Estado de la tarea actualizado</string>
+    <string name="failed_to_update_tasks_status">No se pudo actualizar el estado de la tarea</string>
+    <string name="failed_to_delete_task">No se pudo eliminar la tarea</string>
+    <string name="sign_up">Registrarse</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="password">Constraseña</string>
+    <string name="name">Nombre</string>
+    <string name="email">Correo</string>
+    <string name="create_an_account">Crea una\nCuenta!</string>
+    <string name="don_t_have_an_account">No tienes una cuenta?</string>
+    <string name="sign_in">Acceder</string>
+    <string name="log_in_to_start">Accede para\nempezar!</string>
+    <string name="create_task">Crear tarea</string>
+    <string name="update_task">Actualizar tarea</string>
+    <string name="title">Título</string>
+    <string name="description">Descripción</string>
+    <string name="update">Actualizar</string>
+    <string name="create">Crear</string>
+    <string name="reload">Recargar</string>
+    <string name="log_out">Cerrar sesión</string>
+    <string name="task_created">Tarea creada</string>
+    <string name="task_updated">Tarea actualizada</string>
+    <string name="an_error_has_occurred">Ha habido un problema</string>
+    <string name="due_date">Fecha límite</string>
+    <string name="due_time">Hora límite</string>
+</resources>

@@ -72,8 +72,12 @@ class DetailViewModel @Inject constructor(
     fun deleteTask() {
         viewModelScope.launch {
             (_uiState.value as? DetailUIState.Success)?.apply {
+                _uiState.value = DetailUIState.Loading
                 when (deleteTaskByIdUseCase(task.id)) {
-                    is Result.Error -> _taskDeletedEvent.emit(false)
+                    is Result.Error -> {
+                        _taskDeletedEvent.emit(false)
+                        _uiState.value = copy()
+                    }
                     is Result.Success -> {
                         _taskDeletedEvent.emit(true)
                         _uiState.value = DetailUIState.Deleted

@@ -1,5 +1,6 @@
 package com.example.taskapp.task.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,15 +30,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.R
 import com.example.taskapp.core.presentation.components.CircleBackground
+import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.MyDatePicker
-import com.example.taskapp.core.presentation.components.MyDropDownMenu
 import com.example.taskapp.core.presentation.components.MyFormTextField
 import com.example.taskapp.core.presentation.components.MyTimePicker
+import com.example.taskapp.core.presentation.components.SuccessComponent
 import com.example.taskapp.core.presentation.components.TopAppBarBack
-import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.state.AddTaskUIState
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -54,6 +56,12 @@ fun AddTaskScreen(
         if (taskId == 0L) addTaskViewModel.getEmptyForm() else addTaskViewModel.getTaskForm(taskId)
     }
 
+    LaunchedEffect(key1 = addTaskViewModel.errorEvent) {
+        addTaskViewModel.errorEvent.collectLatest {
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -67,17 +75,16 @@ fun AddTaskScreen(
 
     when (uiState) {
         is AddTaskUIState.Error -> {
-            Text("Error: ${(uiState as AddTaskUIState.Error).message.asString(context)}")
+            ErrorComponent(
+                text = stringResource(R.string.an_error_has_occurred),
+                reload = { addTaskViewModel.getTaskForm(taskId) },
+                hasBackButton = true,
+                onBackPressed = navigationController::popBackStack
+            )
         }
 
         AddTaskUIState.Loading -> {
             LoadingComponent()
-        }
-
-        is AddTaskUIState.Success -> {
-
-            SuccessView(uiState, navigationController)
-
         }
 
         is AddTaskUIState.Editing -> {
@@ -85,20 +92,17 @@ fun AddTaskScreen(
                 (uiState as AddTaskUIState.Editing), addTaskViewModel, navigationController
             )
         }
-    }
-}
 
-@Composable
-private fun SuccessView(
-    uiState: AddTaskUIState, navigationController: NavHostController
-) {
-    Column(Modifier.fillMaxSize()) {
-        Text(text = (uiState as AddTaskUIState.Success).message)
-        Button(onClick = { navigationController.popBackStack() }) {
-            Text(text = "Go Back")
+        AddTaskUIState.Created -> {
+            SuccessComponent(text = stringResource(R.string.task_created), onFinish = navigationController::popBackStack)
+        }
+
+        AddTaskUIState.Updated -> {
+            SuccessComponent(text = stringResource(R.string.task_updated), onFinish = navigationController::popBackStack)
         }
     }
 }
+
 
 @Composable
 private fun MainBody(
@@ -177,19 +181,6 @@ private fun FormBody(
             selectedTime = uiState.dueTime.format(DateTimeFormatter.ofPattern("HH:mm"))
         ) { addTaskViewModel.onDueTimeChanged(LocalTime.of(it.hour, it.minute)) }
         Spacer(modifier = Modifier.height(16.dp))
-
-        if (uiState.mode == "update") {
-            // Spinner
-            MyDropDownMenu(
-                items = TaskStatus.entries,
-                selectedItem = uiState.taskStatus.name.replace("_"," "),
-                onSelected = addTaskViewModel::onTaskStatusChanged,
-                label = "Select task status"
-            ) {
-                it.name
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
 
         Button(
             onClick = addTaskViewModel::onButtonPressed,

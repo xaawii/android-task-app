@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
@@ -35,6 +33,8 @@ import com.example.taskapp.ui.theme.Greyed
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun SingleRowCalendarWithHorizontalScroll(
@@ -75,14 +75,19 @@ fun SingleRowCalendarWithHorizontalScroll(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Month and year
-        Column(modifier = Modifier
-            .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 text = yearMonth.format(DateTimeFormatter.ofPattern("yyyy")),
                 style = MaterialTheme.typography.titleSmall
             )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
                 IconButton(onClick = previousMonth) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowCircleLeft,
@@ -114,11 +119,17 @@ fun SingleRowCalendarWithHorizontalScroll(
             items(days) { day ->
                 val isSelected = selectedDate == day
 
-                DayItem(
-                    date = day,
-                    isSelected = isSelected,
-                    onClick = { onDateChange(day) }
-                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+                    DayItem(
+                        date = day,
+                        isSelected = isSelected,
+                        onClick = { onDateChange(day) }
+                    )
+                }
             }
         }
     }

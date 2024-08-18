@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.R
+import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
@@ -117,7 +118,12 @@ fun DetailScreen(
 
     when (uiState) {
         is DetailUIState.Error -> {
-            Text("Error: ${(uiState as DetailUIState.Error).message.asString(context)}")
+            ErrorComponent(
+                text = "An error has occurred",
+                reload = { detailViewModel.getTask(taskId) },
+                hasBackButton = true,
+                onBackPressed = navigationController::popBackStack
+            )
         }
 
         DetailUIState.Loading -> {
@@ -294,7 +300,7 @@ private fun StatusView(taskStatus: TaskStatus, color: Color, onClick: () -> Unit
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
-            text = taskStatus.name.replace("_"," "),
+            text = taskStatus.name.replace("_", " "),
             style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
         )
     }

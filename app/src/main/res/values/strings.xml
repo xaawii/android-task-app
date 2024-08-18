@@ -23,14 +23,21 @@
     <string name="password">Password</string>
     <string name="name">Name</string>
     <string name="email">Email</string>
-    <string name="create_an_account">Create an\n Account!</string>
+    <string name="create_an_account">Create an  Account!</string>
     <string name="don_t_have_an_account">Don\'t have an account?</string>
     <string name="sign_in">Sign In</string>
-    <string name="log_in_to_start">Log In\n To Start!</string>
+    <string name="log_in_to_start">Sign In  To Start!</string>
     <string name="create_task">Create task</string>
     <string name="update_task">Update task</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
     <string name="update">Update</string>
     <string name="create">Create</string>
+    <string name="reload">Reload</string>
+    <string name="log_out">Log Out</string>
+    <string name="task_created">Task Created</string>
+    <string name="task_updated">Task Updated</string>
+    <string name="an_error_has_occurred">An error has occurred</string>
+    <string name="due_date">Due date</string>
+    <string name="due_time">Due time</string>
 </resources>
