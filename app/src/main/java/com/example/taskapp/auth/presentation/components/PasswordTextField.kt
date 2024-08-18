@@ -38,11 +38,14 @@ fun PasswordTextField(
 
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    Column {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         TextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent
@@ -86,7 +89,11 @@ fun PasswordTextField(
         )
 
         if (!isValid && value.isNotEmpty() && errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, style = MaterialTheme.typography.bodyMedium, color = Color.Red)
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Red
+            )
         }
     }
 }

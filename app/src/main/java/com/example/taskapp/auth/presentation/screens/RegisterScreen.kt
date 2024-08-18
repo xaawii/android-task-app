@@ -58,7 +58,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     LaunchedEffect(Unit) {
         registerViewModel.registeredEvent.collectLatest {
-            Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.account_created), Toast.LENGTH_SHORT).show()
             navigationController.navigate(Routes.LoginScreen) {
                 popUpTo(Routes.RegisterScreen) { inclusive = true }
             }

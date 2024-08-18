@@ -18,7 +18,6 @@ import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -49,8 +47,10 @@ import androidx.navigation.NavHostController
 import com.example.taskapp.R
 import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
+import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
+import com.example.taskapp.task.presentation.components.DeleteAlertDialog
 import com.example.taskapp.task.presentation.state.DetailUIState
 import com.example.taskapp.task.presentation.viewmodel.DetailViewModel
 import com.example.taskapp.ui.theme.Greyed
@@ -274,33 +274,20 @@ fun DetailBody(
 
 }
 
-@Composable
-private fun DeleteAlertDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        title = { Text(text = "Delete task") },
-        text = { Text(text = "Are you sure you want to delete this task?") },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = "Yes")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = "No")
-            }
-        })
-}
 
 @Composable
-private fun StatusView(taskStatus: TaskStatus, color: Color, onClick: () -> Unit) {
+private fun StatusView(
+    taskStatus: TaskStatus,
+    color: Color,
+    onClick: () -> Unit
+) {
     Card(
         Modifier.clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = color)
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
-            text = taskStatus.name.replace("_", " "),
+            text = taskStatus.asUiText().asString(),
             style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
         )
     }
