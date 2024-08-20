@@ -15,9 +15,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.taskapp.auth.presentation.screens.InitScreen
 import com.example.taskapp.auth.presentation.screens.LoginScreen
+import com.example.taskapp.auth.presentation.screens.RecoverPasswordScreen
 import com.example.taskapp.auth.presentation.screens.RegisterScreen
 import com.example.taskapp.auth.presentation.viewmodel.InitViewModel
 import com.example.taskapp.auth.presentation.viewmodel.LoginViewModel
+import com.example.taskapp.auth.presentation.viewmodel.RecoverPasswordViewModel
 import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.presentation.screens.AddTaskScreen
@@ -38,6 +40,7 @@ class MainActivity : ComponentActivity() {
     private val addTaskViewModel: AddTaskViewModel by viewModels()
     private val registerViewModel: RegisterViewModel by viewModels()
     private val detailViewModel: DetailViewModel by viewModels()
+    private val recoverPasswordViewModel: RecoverPasswordViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +72,13 @@ class MainActivity : ComponentActivity() {
 
                         composable<Routes.RegisterScreen> {
                             RegisterScreen(registerViewModel, navigationController)
+                        }
+
+                        composable<Routes.RecoverPasswordScreen> {
+                            RecoverPasswordScreen(
+                                recoverPasswordViewModel = recoverPasswordViewModel,
+                                navigationController = navigationController
+                            )
                         }
 
                         composable<Routes.TasksListScreen> {

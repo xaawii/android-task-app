@@ -54,4 +54,11 @@
     <string name="password_dont_match">Password don\'t match</string>
     <string name="min_three_characters">Min 3 characters</string>
     <string name="invalid_email_format">Invalid email format</string>
+    <string name="recover_password">Recover Password</string>
+    <string name="password_changed">Password Changed</string>
+    <string name="write_down_your_email_if_the_email_is_registered_you_will_receive_a_security_code">Write down your email. If the email is registered, you will receive a security code.</string>
+    <string name="send">Send</string>
+    <string name="security_code">Security Code</string>
+    <string name="enter_your_new_password">Enter your new password.</string>
+    <string name="enter_the_security_code_that_you_should_have_received_at_the_indicated_email">Enter the security code that you should have received at the indicated email.</string>
 </resources>

@@ -49,4 +49,10 @@
     <string name="status_pending">Pendiente</string>
     <string name="status_in_progress">En progreso</string>
     <string name="status_completed">Completada</string>
+    <string name="min_six_characters">Mínimo 6 caracteres</string>
+    <string name="need_min_one_uppercase">Mínimo 1 mayúscula</string>
+    <string name="need_min_one_digit">Mínimo 1 dígito</string>
+    <string name="password_dont_match">La contraseña no coincide</string>
+    <string name="min_three_characters">Mínimo 3 caracteres</string>
+    <string name="invalid_email_format">Formato de correo inválido</string>
 </resources>
