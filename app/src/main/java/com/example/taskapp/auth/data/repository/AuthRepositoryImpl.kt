@@ -131,7 +131,9 @@ class AuthRepositoryImpl @Inject constructor(
                 if (response.isSuccessful && response.body() != null) {
                     Result.Success(response.body()!!)
                 } else {
+                    println("Error CODE: ${response.code()}")
                     when (response.code()) {
+                        400 -> Result.Error(DataError.Network.BAD_REQUEST)
                         404 -> Result.Error(DataError.Network.NOT_FOUND)
                         408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
                         else -> Result.Error(DataError.Network.UNKNOWN)

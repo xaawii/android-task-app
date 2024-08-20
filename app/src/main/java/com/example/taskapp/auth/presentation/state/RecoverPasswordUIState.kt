@@ -13,7 +13,8 @@ sealed class RecoverPasswordUIState {
 
     data class SendCode(
         val code: String = "",
-        val codeIsValid: Boolean = false
+        val codeIsValid: Boolean = false,
+        val invalidCode: Boolean = false
     ) : RecoverPasswordUIState()
 
     data class SendPassword(

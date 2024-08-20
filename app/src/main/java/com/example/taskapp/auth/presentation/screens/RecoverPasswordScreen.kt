@@ -1,5 +1,6 @@
 package com.example.taskapp.auth.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -35,6 +37,7 @@ import com.example.taskapp.core.presentation.components.MyFormTextField
 import com.example.taskapp.core.presentation.components.SuccessComponent
 import com.example.taskapp.core.presentation.components.TopAppBarBack
 import com.example.taskapp.core.routes.Routes
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RecoverPasswordScreen(
@@ -43,6 +46,16 @@ fun RecoverPasswordScreen(
 ) {
 
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        recoverPasswordViewModel.resetState()
+    }
+
+    LaunchedEffect(Unit) {
+        recoverPasswordViewModel.errorEvent.collectLatest {
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -96,7 +109,7 @@ private fun MainBody(
                         recoverPasswordViewModel = recoverPasswordViewModel
                     )
 
-                    is RecoverPasswordUIState.SendEmail -> SendCodeComponent(
+                    is RecoverPasswordUIState.SendEmail -> SendEmailComponent(
                         uiState = uiState,
                         recoverPasswordViewModel = recoverPasswordViewModel
                     )
@@ -124,7 +137,7 @@ private fun MainBody(
 }
 
 @Composable
-fun SendCodeComponent(
+fun SendEmailComponent(
     uiState: RecoverPasswordUIState.SendEmail,
     recoverPasswordViewModel: RecoverPasswordViewModel
 ) {
@@ -139,11 +152,13 @@ fun SendCodeComponent(
         MyFormTextField(
             label = stringResource(id = R.string.email),
             value = uiState.email,
+            isValid = uiState.emailIsValid,
             keyboardType = KeyboardType.Email,
             errorMessage = uiState.emailError?.asString() ?: "",
             onValueChange = recoverPasswordViewModel::onEmailChanged
         )
-        Button(onClick = { /*TODO*/ }, enabled = uiState.emailIsValid) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = recoverPasswordViewModel::sendEmail, enabled = uiState.emailIsValid) {
             Text(text = stringResource(R.string.send))
         }
     }
@@ -165,11 +180,19 @@ fun ValidateCodeComponent(
         Spacer(modifier = Modifier.height(8.dp))
         MyFormTextField(
             label = stringResource(R.string.security_code),
+            isValid = uiState.codeIsValid,
             value = uiState.code,
             keyboardType = KeyboardType.Text,
-            onValueChange = {/*TODO*/ }
+            onValueChange = recoverPasswordViewModel::onCodeChanged
         )
-        Button(onClick = { /*TODO*/ }, enabled = uiState.codeIsValid) {
+        if (uiState.invalidCode) {
+            Text(
+                text = stringResource(R.string.invalid_code),
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Red)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = recoverPasswordViewModel::sendCode, enabled = uiState.codeIsValid) {
             Text(text = stringResource(R.string.send))
         }
     }
@@ -190,6 +213,7 @@ fun ChangePasswordComponent(
         Spacer(modifier = Modifier.height(8.dp))
         PasswordTextField(
             value = uiState.password,
+            isValid = uiState.formIsValid,
             label = stringResource(id = R.string.password),
             errorMessage = uiState.passwordError?.asString() ?: "",
             onValueChange = recoverPasswordViewModel::onPasswordChanged
@@ -197,10 +221,12 @@ fun ChangePasswordComponent(
         Spacer(modifier = Modifier.height(8.dp))
         PasswordTextField(
             value = uiState.confirmPassword,
+            isValid = uiState.passwordMatch,
             label = stringResource(id = R.string.confirm_password),
             onValueChange = recoverPasswordViewModel::onConfirmPasswordChanged
         )
-        Button(onClick = { /*TODO*/ }, enabled = uiState.formIsValid) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = recoverPasswordViewModel::sendPassword, enabled = uiState.formIsValid) {
             Text(text = stringResource(R.string.send))
         }
     }
