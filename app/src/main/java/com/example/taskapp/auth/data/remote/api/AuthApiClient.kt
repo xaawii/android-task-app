@@ -6,6 +6,7 @@ import com.example.taskapp.auth.data.remote.dto.TokenDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AuthApiClient {
 
@@ -18,5 +19,16 @@ interface AuthApiClient {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ): Response<TokenDto>
+
+    @POST("/password-token/forgot-password")
+    suspend fun forgotPassword(
+        @Query("email") email: String
+    ): Response<Void>
+
+    @POST("/password-token/reset-password")
+    suspend fun resetPassword(
+        @Query("token") token: String,
+        @Query("newPassword") newPassword: String
+    ): Response<Void>
 
 }

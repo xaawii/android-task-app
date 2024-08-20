@@ -73,4 +73,55 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun forgotPassword(email: String): Result<Unit, DataError.Network> {
+        return withContext(Dispatchers.IO) {
+            try {
+
+                val response =
+                    authApiClient.forgotPassword(email)
+
+                if (response.isSuccessful) {
+                    Result.Success(Unit)
+                } else {
+                    when (response.code()) {
+                        400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                        408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                        else -> Result.Error(DataError.Network.UNKNOWN)
+                    }
+                }
+            } catch (e: IOException) {
+                Result.Error(DataError.Network.NO_INTERNET)
+            } catch (e: Exception) {
+                Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
+    }
+
+    override suspend fun resetPassword(
+        token: String,
+        newPassword: String
+    ): Result<Unit, DataError.Network> {
+        return withContext(Dispatchers.IO) {
+            try {
+
+                val response =
+                    authApiClient.resetPassword(token, newPassword)
+
+                if (response.isSuccessful) {
+                    Result.Success(Unit)
+                } else {
+                    when (response.code()) {
+                        400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                        408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                        else -> Result.Error(DataError.Network.UNKNOWN)
+                    }
+                }
+            } catch (e: IOException) {
+                Result.Error(DataError.Network.NO_INTERNET)
+            } catch (e: Exception) {
+                Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
+    }
+
 }
