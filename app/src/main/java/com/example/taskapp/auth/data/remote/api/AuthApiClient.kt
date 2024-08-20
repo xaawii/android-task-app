@@ -31,4 +31,9 @@ interface AuthApiClient {
         @Query("newPassword") newPassword: String
     ): Response<Void>
 
+    @POST("/password-token/validate")
+    suspend fun validatePasswordToken(
+        @Query("token") token: String
+    ): Response<Boolean>
+
 }

@@ -11,4 +11,5 @@ interface AuthRepository {
     suspend fun login(userModel: UserModel): Result<TokenDto, DataError.Network>
     suspend fun forgotPassword(email: String): Result<Unit, DataError.Network>
     suspend fun resetPassword(token: String, newPassword: String): Result<Unit, DataError.Network>
+    suspend fun validatePasswordToken(token: String): Result<Boolean, DataError.Network>
 }

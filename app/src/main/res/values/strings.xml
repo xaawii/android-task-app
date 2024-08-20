@@ -48,4 +48,10 @@
     <string name="status_pending">Pending</string>
     <string name="status_in_progress">In progress</string>
     <string name="status_completed">Completed</string>
+    <string name="min_six_characters">Min 6 characters</string>
+    <string name="need_min_one_uppercase">Need at least one uppercase</string>
+    <string name="need_min_one_digit">Need at least one digit</string>
+    <string name="password_dont_match">Password don\'t match</string>
+    <string name="min_three_characters">Min 3 characters</string>
+    <string name="invalid_email_format">Invalid email format</string>
 </resources>

@@ -58,7 +58,8 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
     LaunchedEffect(Unit) {
         registerViewModel.registeredEvent.collectLatest {
-            Toast.makeText(context, context.getString(R.string.account_created), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.account_created), Toast.LENGTH_SHORT)
+                .show()
             navigationController.navigate(Routes.LoginScreen) {
                 popUpTo(Routes.RegisterScreen) { inclusive = true }
             }
@@ -148,7 +149,7 @@ private fun RegisterBody(
                 label = stringResource(R.string.email),
                 value = uiState.email,
                 isValid = uiState.emailIsValid,
-                errorMessage = uiState.emailError,
+                errorMessage = uiState.emailError?.asString() ?: "",
                 keyboardType = KeyboardType.Email,
                 onValueChange = registerViewModel::onEmailChanged
             )
@@ -160,7 +161,7 @@ private fun RegisterBody(
                 label = stringResource(R.string.name),
                 value = uiState.name,
                 isValid = uiState.nameIsValid,
-                errorMessage = uiState.nameError,
+                errorMessage = uiState.nameError?.asString() ?: "",
                 keyboardType = KeyboardType.Text,
                 onValueChange = registerViewModel::onNameChanged
             )
@@ -173,7 +174,7 @@ private fun RegisterBody(
                 value = uiState.password,
                 label = stringResource(R.string.password),
                 isValid = uiState.passwordIsValid,
-                errorMessage = uiState.passwordError,
+                errorMessage = uiState.passwordError?.asString() ?: "",
                 onValueChange = registerViewModel::onPasswordChanged
             )
             Spacer(modifier = Modifier.height(16.dp))
