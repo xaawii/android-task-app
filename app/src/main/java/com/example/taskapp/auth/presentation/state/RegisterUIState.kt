@@ -4,6 +4,7 @@ import com.example.taskapp.core.presentation.utils.UiText
 
 sealed class RegisterUIState {
     data object Loading : RegisterUIState()
+    data object Success : RegisterUIState()
     data class Editing(
         val email: String = "",
         val name: String = "",

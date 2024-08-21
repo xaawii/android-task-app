@@ -36,6 +36,7 @@ import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.MyFormTextField
+import com.example.taskapp.core.presentation.components.SuccessComponent
 import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -54,16 +55,6 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
     LaunchedEffect(Unit) {
         registerViewModel.errorEvent.collectLatest {
             Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        registerViewModel.registeredEvent.collectLatest {
-            Toast.makeText(context, context.getString(R.string.account_created), Toast.LENGTH_SHORT)
-                .show()
-            navigationController.navigate(Routes.LoginScreen) {
-                popUpTo(Routes.RegisterScreen) { inclusive = true }
-            }
         }
     }
 
@@ -88,6 +79,16 @@ fun RegisterScreen(registerViewModel: RegisterViewModel, navigationController: N
 
         RegisterUIState.Loading -> {
             LoadingComponent()
+        }
+
+        RegisterUIState.Success -> {
+            SuccessComponent(
+                text = stringResource(R.string.account_created),
+                onFinish = {
+                    navigationController.navigate(Routes.LoginScreen) {
+                        popUpTo(Routes.RegisterScreen) { inclusive = true }
+                    }
+                })
         }
     }
 }
