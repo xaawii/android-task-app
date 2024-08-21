@@ -29,10 +29,6 @@ class RegisterViewModel @Inject constructor(
     private val _errorEvent = MutableSharedFlow<UiText>()
     val errorEvent: SharedFlow<UiText> = _errorEvent
 
-    //registered event
-    private val _registeredEvent = MutableSharedFlow<Unit>()
-    val registeredEvent: SharedFlow<Unit> = _registeredEvent
-
 
     fun register() {
         viewModelScope.launch {
@@ -49,7 +45,7 @@ class RegisterViewModel @Inject constructor(
 
                 when (val result = registerUseCase(user)) {
                     is Result.Error -> emitError(result.error.asUiText())
-                    is Result.Success -> _registeredEvent.emit(Unit)
+                    is Result.Success -> _uiState.value = RegisterUIState.Success
                 }
             }
         }
