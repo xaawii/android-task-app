@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -33,7 +32,8 @@ fun MyFormTextField(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)) {
+            .padding(16.dp)
+    ) {
         TextField(
             modifier = modifier
                 .fillMaxWidth(),
@@ -43,7 +43,7 @@ fun MyFormTextField(
             ),
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label, textAlign = TextAlign.Start) },
+            label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
             maxLines = maxLines,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

@@ -193,12 +193,13 @@ private fun MainBody(
                     yearMonth = uiState.yearMonth,
                     onDateChange = taskListViewModel::changeSelectedDate,
                     generateDaysInMonth = taskListViewModel::generateDaysInMonth,
+                    generateDaysInMonthWithTaskCount = taskListViewModel::generateDaysInMonthWithTaskCount,
                     calculateScrollOffset = taskListViewModel::calculateScrollOffset,
                     previousMonth = { taskListViewModel.changeMonth(false) },
                     nextMonth = { taskListViewModel.changeMonth(true) }
                 )
 
-                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 //task list
                 if (uiState.tasks.isEmpty()) {
                     NoTaskText()

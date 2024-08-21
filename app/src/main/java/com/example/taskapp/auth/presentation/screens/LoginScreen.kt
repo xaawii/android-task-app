@@ -2,6 +2,7 @@ package com.example.taskapp.auth.presentation.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -129,12 +130,14 @@ private fun LoginBody(
         )
         Spacer(modifier = Modifier.height(32.dp))
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues = contentPadding)
-            .weight(1F),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues = contentPadding)
+                .weight(1F),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
+            verticalArrangement = Arrangement.Center
+        ) {
             MyFormTextField(
                 label = stringResource(R.string.email),
                 value = uiState.email,
@@ -149,6 +152,18 @@ private fun LoginBody(
                 label = stringResource(R.string.password),
                 onValueChange = loginViewModel::onPasswordChanged
             )
+
+            Box(modifier = Modifier.fillMaxWidth(),
+                Alignment.CenterEnd){
+                TextButton(
+                    onClick = { navigationController.navigate(Routes.RecoverPasswordScreen) }
+                ) {
+                    Text(
+                        text = stringResource(R.string.forgot_password),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(

@@ -13,6 +13,9 @@ sealed class Routes {
     object RegisterScreen
 
     @Serializable
+    object RecoverPasswordScreen
+
+    @Serializable
     object TasksListScreen
 
     @Serializable

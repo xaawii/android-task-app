@@ -99,9 +99,8 @@ class RegisterViewModel @Inject constructor(
 
     private fun validatePassword(password: String) {
         when (val result = userDataValidator.validatePassword(password)) {
-            is Result.Error -> handlePasswordError(result.error)
+            is Result.Error -> handlePasswordError(result.error.asUiText())
             is Result.Success -> {
-                changePasswordErrorMessage("")
                 changePasswordIsValid(true)
             }
         }
@@ -109,27 +108,20 @@ class RegisterViewModel @Inject constructor(
 
     private fun validatePasswordMatches(password: String, confirmPassword: String) {
         when (val result = userDataValidator.validatePasswordMatches(password, confirmPassword)) {
-            is Result.Error -> handlePasswordError(result.error)
+            is Result.Error -> handlePasswordError(result.error.asUiText())
             is Result.Success -> {
-                changePasswordErrorMessage("")
                 changePasswordIsValid(true)
             }
         }
         checkPasswordMatches()
     }
 
-    private fun handlePasswordError(error: UserDataValidator.PasswordError) {
-        val message = when (error) {
-            UserDataValidator.PasswordError.TOO_SHORT -> "Min 6 characters"
-            UserDataValidator.PasswordError.NO_UPPERCASE -> "Needs at least one uppercase"
-            UserDataValidator.PasswordError.NO_DIGIT -> "Needs at least one digit"
-            UserDataValidator.PasswordError.NO_MATCHES -> "Confirm password don't match"
-        }
-        changePasswordErrorMessage(message)
+    private fun handlePasswordError(error: UiText) {
+        changePasswordErrorMessage(error)
         changePasswordIsValid(false)
     }
 
-    private fun changePasswordErrorMessage(errorMessage: String) {
+    private fun changePasswordErrorMessage(errorMessage: UiText) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(passwordError = errorMessage)
         }
@@ -149,23 +141,19 @@ class RegisterViewModel @Inject constructor(
 
     private fun validateEmail(email: String) {
         when (val result = userDataValidator.validateEmail(email)) {
-            is Result.Error -> handleEmailError(result.error)
-
+            is Result.Error -> handleEmailError(result.error.asUiText())
             is Result.Success -> {
-                changeEmailErrorMessage("")
                 changeEmailIsValid(true)
             }
         }
     }
 
-    private fun handleEmailError(error: UserDataValidator.EmailError) {
-        if (error == UserDataValidator.EmailError.INVALID_FORMAT) {
-            changeEmailErrorMessage("Invalid email format")
-            changeEmailIsValid(false)
-        }
+    private fun handleEmailError(error: UiText) {
+        changeEmailErrorMessage(errorMessage = error)
+        changeEmailIsValid(false)
     }
 
-    private fun changeEmailErrorMessage(errorMessage: String) {
+    private fun changeEmailErrorMessage(errorMessage: UiText) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(emailError = errorMessage)
         }
@@ -179,22 +167,19 @@ class RegisterViewModel @Inject constructor(
 
     private fun validateName(name: String) {
         when (val result = userDataValidator.validateName(name)) {
-            is Result.Error -> handleNameError(result.error)
+            is Result.Error -> handleNameError(result.error.asUiText())
             is Result.Success -> {
-                changeNameErrorMessage("")
                 changeNameIsValid(true)
             }
         }
     }
 
-    private fun handleNameError(error: UserDataValidator.NameError) {
-        if (error == UserDataValidator.NameError.TOO_SHORT) {
-            changeNameErrorMessage("Min 3 characters")
-            changeNameIsValid(false)
-        }
+    private fun handleNameError(error: UiText) {
+        changeNameErrorMessage(error)
+        changeNameIsValid(false)
     }
 
-    private fun changeNameErrorMessage(errorMessage: String) {
+    private fun changeNameErrorMessage(errorMessage: UiText) {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             _uiState.value = copy(nameError = errorMessage)
         }
@@ -209,7 +194,6 @@ class RegisterViewModel @Inject constructor(
     private fun checkFormIsValid() {
         (_uiState.value as? RegisterUIState.Editing)?.apply {
             val formValid = emailIsValid && nameIsValid && passwordIsValid && passwordMatch
-            println("Form valid: ${emailIsValid}, ${nameIsValid},${passwordIsValid},${passwordMatch},")
             _uiState.value = copy(formIsValid = formValid)
         }
     }

@@ -1,5 +1,7 @@
 package com.example.taskapp.auth.presentation.state
 
+import com.example.taskapp.core.presentation.utils.UiText
+
 sealed class RegisterUIState {
     data object Loading : RegisterUIState()
     data class Editing(
@@ -11,9 +13,9 @@ sealed class RegisterUIState {
         val emailIsValid: Boolean = false,
         val nameIsValid: Boolean = false,
         val passwordIsValid: Boolean = false,
-        val emailError: String = "",
-        val nameError: String = "",
-        val passwordError: String = "",
+        val emailError: UiText? = null,
+        val nameError: UiText? = null,
+        val passwordError: UiText? = null,
         val formIsValid: Boolean = false
     ) : RegisterUIState()
 

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowCircleLeft
 import androidx.compose.material.icons.rounded.ArrowCircleRight
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.taskapp.task.presentation.model.LocalDateWithTaskCount
 import com.example.taskapp.ui.theme.Greyed
 import java.time.LocalDate
 import java.time.YearMonth
@@ -42,6 +47,7 @@ fun SingleRowCalendarWithHorizontalScroll(
     yearMonth: YearMonth,
     onDateChange: (LocalDate) -> Unit,
     generateDaysInMonth: (YearMonth) -> List<LocalDate>,
+    generateDaysInMonthWithTaskCount: (List<LocalDate>) -> List<LocalDateWithTaskCount>,
     calculateScrollOffset: (LazyListState) -> Int,
     previousMonth: () -> Unit,
     nextMonth: () -> Unit,
@@ -50,6 +56,7 @@ fun SingleRowCalendarWithHorizontalScroll(
 
     // generate days in a specific month
     val days = generateDaysInMonth(yearMonth)
+    val daysWithTaskCount = generateDaysInMonthWithTaskCount(days)
 
     val listState = rememberLazyListState()
 
@@ -84,6 +91,7 @@ fun SingleRowCalendarWithHorizontalScroll(
                 text = yearMonth.format(DateTimeFormatter.ofPattern("yyyy")),
                 style = MaterialTheme.typography.titleSmall
             )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
@@ -109,6 +117,8 @@ fun SingleRowCalendarWithHorizontalScroll(
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         // LazyRow with horizontal scroll for the days
         LazyRow(
             state = listState,
@@ -116,19 +126,32 @@ fun SingleRowCalendarWithHorizontalScroll(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
-            items(days) { day ->
-                val isSelected = selectedDate == day
+            items(daysWithTaskCount) { day ->
+                val isSelected = selectedDate == day.localDate
 
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
-                    DayItem(
-                        date = day,
-                        isSelected = isSelected,
-                        onClick = { onDateChange(day) }
+                    Text(
+                        text = day.localDate.dayOfWeek.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault()
+                        )
                     )
+                    DayItem(
+                        date = day.localDate,
+                        isSelected = isSelected,
+                        onClick = { onDateChange(day.localDate) }
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    if (day.taskCount > 0) {
+                        Card(
+                            Modifier.size(4.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
+                        ) { }
+                    }
+
                 }
             }
         }
@@ -143,7 +166,7 @@ fun DayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
 
     Column(
         modifier = Modifier
-            .size(48.dp)
+            .size(36.dp)
             .clip(RoundedCornerShape(100.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick),
