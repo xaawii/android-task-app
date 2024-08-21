@@ -42,7 +42,7 @@ class RegisterViewModel @Inject constructor(
                 val user = UserModel(
                     id = 0,
                     email = email,
-                    name = "",
+                    name = name,
                     password = password,
                     role = "ROLE_USER"
                 )
