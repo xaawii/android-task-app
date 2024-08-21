@@ -40,7 +40,6 @@ class TaskListViewModel @Inject constructor(
 
     private var taskList: MutableList<TaskUIModel> = mutableListOf()
 
-
     //event for task deleted
     private val _taskDeletedEvent = MutableSharedFlow<Boolean>()
     val taskDeletedEvent: SharedFlow<Boolean> = _taskDeletedEvent
@@ -49,6 +48,8 @@ class TaskListViewModel @Inject constructor(
     private val _taskStatusEvent = MutableSharedFlow<Boolean>()
     val taskStatusEvent: SharedFlow<Boolean> = _taskStatusEvent
 
+    private var _selectedDay = LocalDate.now()
+    private var _selectedYearMonth = YearMonth.now()
 
     fun getTasks() {
         viewModelScope.launch {
@@ -63,7 +64,11 @@ class TaskListViewModel @Inject constructor(
                     taskList =
                         taskUIModelMapper.fromDomainListToUIList(result.data).toMutableList()
                     _uiState.value =
-                        TaskListUIState.Success(userName = getUserNameFromDataStoreUseCase())
+                        TaskListUIState.Success(
+                            userName = getUserNameFromDataStoreUseCase(),
+                            selectedDate = _selectedDay,
+                            yearMonth = _selectedYearMonth
+                        )
                     filterTasksBySelectedDayAndOrderByTime()
                 }
             }
@@ -90,6 +95,7 @@ class TaskListViewModel @Inject constructor(
 
     fun changeSelectedDate(newDate: LocalDate) {
         (_uiState.value as? TaskListUIState.Success)?.apply {
+            _selectedDay = newDate
             _uiState.value = copy(selectedDate = newDate)
             filterTasksBySelectedDayAndOrderByTime()
         }
@@ -159,6 +165,7 @@ class TaskListViewModel @Inject constructor(
     fun changeMonth(isNext: Boolean) {
         (_uiState.value as? TaskListUIState.Success)?.apply {
             val resultMonth = if (isNext) yearMonth.plusMonths(1) else yearMonth.minusMonths(1)
+            _selectedYearMonth = resultMonth
             _uiState.value = copy(yearMonth = resultMonth)
         }
     }
