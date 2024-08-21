@@ -193,6 +193,7 @@ private fun MainBody(
                     yearMonth = uiState.yearMonth,
                     onDateChange = taskListViewModel::changeSelectedDate,
                     generateDaysInMonth = taskListViewModel::generateDaysInMonth,
+                    generateDaysInMonthWithTaskCount = taskListViewModel::generateDaysInMonthWithTaskCount,
                     calculateScrollOffset = taskListViewModel::calculateScrollOffset,
                     previousMonth = { taskListViewModel.changeMonth(false) },
                     nextMonth = { taskListViewModel.changeMonth(true) }

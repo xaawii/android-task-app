@@ -40,8 +40,9 @@ import com.example.taskapp.core.presentation.components.TopAppBarBack
 import com.example.taskapp.task.presentation.state.AddTaskUIState
 import com.example.taskapp.task.presentation.viewmodel.AddTaskViewModel
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDate
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 
@@ -174,9 +175,9 @@ private fun FormBody(
         // Selector de fecha
         MyDatePicker(uiState.dueDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) { datePickerState ->
             datePickerState.selectedDateMillis?.let {
-                addTaskViewModel.onDueDateChanged(
-                    LocalDate.ofEpochDay(it)
-                )
+                val localDate =
+                    Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+                addTaskViewModel.onDueDateChanged(localDate)
             }
 
         }

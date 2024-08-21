@@ -12,6 +12,7 @@ import com.example.taskapp.task.domain.usecases.DeleteTaskByIdUseCase
 import com.example.taskapp.task.domain.usecases.GetAllTasksByUserIdUseCase
 import com.example.taskapp.task.domain.usecases.UpdateTaskUseCase
 import com.example.taskapp.task.mappers.TaskUIModelMapper
+import com.example.taskapp.task.presentation.model.LocalDateWithTaskCount
 import com.example.taskapp.task.presentation.model.TaskUIModel
 import com.example.taskapp.task.presentation.state.TaskListUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -145,6 +146,13 @@ class TaskListViewModel @Inject constructor(
     fun generateDaysInMonth(yearMonth: YearMonth): List<LocalDate> {
         return (1..yearMonth.lengthOfMonth()).map { day ->
             yearMonth.atDay(day)
+        }
+    }
+
+    fun generateDaysInMonthWithTaskCount(days: List<LocalDate>): List<LocalDateWithTaskCount> {
+        return (days).map { day ->
+            val countTaskForLocalDay = taskList.count { it.dueDate.toLocalDate() == day }
+            LocalDateWithTaskCount(day, countTaskForLocalDay)
         }
     }
 
