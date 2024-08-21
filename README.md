@@ -3,6 +3,8 @@
 ## Description
 This is an Android Compose application that I created as a front end for my [Task Manager Api](https://github.com/xaawii/task-manager-api).
 
+This app was created using Kotlin 2.0, Jetpack Compose, MVVM, Clean Architecture, State Flows, Type-Safe Navigation, Retrofit and more.
+
 In this app, you can register and log in to the API, and use the password recovery system, which will send a security code to your email that you will need to enter in the app.
 You can also create, update, and delete tasks for any day, and see all your tasks for each day on the scrollable calendar that I created.
 
