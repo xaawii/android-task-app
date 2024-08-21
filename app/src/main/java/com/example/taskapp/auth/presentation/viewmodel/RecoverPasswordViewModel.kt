@@ -41,11 +41,8 @@ class RecoverPasswordViewModel @Inject constructor(
 
                 _uiState.value = RecoverPasswordUIState.Loading
 
-                when (val result = sendRecoverPasswordPetitionUseCase(email)) {
-                    is Result.Error -> {
-                        emitError(result.error.asUiText())
-                        _uiState.value = RecoverPasswordUIState.SendEmail()
-                    }
+                when (sendRecoverPasswordPetitionUseCase(email)) {
+                    is Result.Error -> _uiState.value = RecoverPasswordUIState.SendCode()
 
                     is Result.Success -> _uiState.value = RecoverPasswordUIState.SendCode()
                 }

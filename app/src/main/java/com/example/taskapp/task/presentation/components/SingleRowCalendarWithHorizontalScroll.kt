@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
@@ -84,6 +86,7 @@ fun SingleRowCalendarWithHorizontalScroll(
                 text = yearMonth.format(DateTimeFormatter.ofPattern("yyyy")),
                 style = MaterialTheme.typography.titleSmall
             )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
@@ -108,6 +111,8 @@ fun SingleRowCalendarWithHorizontalScroll(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // LazyRow with horizontal scroll for the days
         LazyRow(

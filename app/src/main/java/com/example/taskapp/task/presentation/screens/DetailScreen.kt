@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -39,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -51,6 +51,7 @@ import com.example.taskapp.core.presentation.utils.asUiText
 import com.example.taskapp.core.routes.Routes
 import com.example.taskapp.task.domain.enum.TaskStatus
 import com.example.taskapp.task.presentation.components.DeleteAlertDialog
+import com.example.taskapp.task.presentation.components.TextFieldForPicker
 import com.example.taskapp.task.presentation.state.DetailUIState
 import com.example.taskapp.task.presentation.viewmodel.DetailViewModel
 import com.example.taskapp.ui.theme.Greyed
@@ -236,30 +237,40 @@ fun DetailBody(
             style = MaterialTheme.typography.titleSmall
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = uiState.task.description,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Spacer(modifier = Modifier.height(36.dp))
-        Row {
-            Icon(imageVector = Icons.Rounded.CalendarMonth, contentDescription = "date")
-            Spacer(modifier = Modifier.width(8.dp))
+
+
+
+        if (uiState.task.description.isNotBlank()) {
             Text(
-                text = uiState.task.dueDate.toLocalDate()
-                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                modifier = Modifier.fillMaxWidth(),
+                text = uiState.task.description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "No description for this task",
+                style = MaterialTheme.typography.bodySmall.copy(fontStyle = FontStyle.Italic)
             )
         }
+
+
+        Spacer(modifier = Modifier.height(36.dp))
+
+        TextFieldForPicker(value = uiState.task.dueDate.toLocalDate()
+            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            icon = Icons.Rounded.CalendarMonth,
+            onClick = { })
+
         Spacer(modifier = Modifier.height(8.dp))
-        Row {
-            Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = "time")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = uiState.task.dueDate.toLocalTime()
-                    .format(DateTimeFormatter.ofPattern("HH:mm"))
-            )
-        }
+
+        TextFieldForPicker(value = uiState.task.dueDate.toLocalTime()
+            .format(DateTimeFormatter.ofPattern("HH:mm")),
+            icon = Icons.Rounded.AccessTime,
+            onClick = { })
+
         Spacer(modifier = Modifier.height(36.dp))
+
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly, Alignment.CenterVertically) {
             TaskStatus.entries.forEach {
                 val color =

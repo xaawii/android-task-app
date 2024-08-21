@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +36,6 @@ import com.example.taskapp.auth.presentation.viewmodel.RegisterViewModel
 import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.MyFormTextField
-import com.example.taskapp.core.presentation.components.TopAppBarBack
 import com.example.taskapp.core.routes.Routes
 import kotlinx.coroutines.flow.collectLatest
 
@@ -100,19 +101,14 @@ private fun MainBody(
     CircleBackground(color = MaterialTheme.colorScheme.primary) {
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                TopAppBarBack(
-                    title = stringResource(
-                        R.string.create_an_account
-                    ),
-                    titleStyle = MaterialTheme.typography.titleLarge,
-                    onBackPressed = navigationController::popBackStack
-                )
-            },
         ) { contentPadding ->
 
 
-            RegisterBody(contentPadding, uiState, registerViewModel)
+            RegisterBody(contentPadding, uiState, registerViewModel, goToLogin = {
+                navigationController.navigate(Routes.LoginScreen) {
+                    popUpTo(Routes.RegisterScreen) { inclusive = true }
+                }
+            })
 
 
         }
@@ -125,24 +121,31 @@ private fun MainBody(
 private fun RegisterBody(
     paddingValues: PaddingValues,
     uiState: RegisterUIState.Editing,
-    registerViewModel: RegisterViewModel
+    registerViewModel: RegisterViewModel,
+    goToLogin: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Text(
+            text = stringResource(R.string.create_an_account),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(32.dp))
 
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .weight(1F),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxWidth()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //email
             MyFormTextField(
@@ -194,6 +197,28 @@ private fun RegisterBody(
             ) {
                 Text(
                     text = stringResource(R.string.sign_up),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .weight(1F),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Text(
+                text = stringResource(R.string.already_have_an_account),
+                style = MaterialTheme.typography.bodySmall
+            )
+            TextButton(
+                onClick = goToLogin
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_in),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

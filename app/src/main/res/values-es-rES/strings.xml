@@ -57,7 +57,7 @@
     <string name="invalid_email_format">Formato de correo inválido</string>
     <string name="recover_password">Recuperar Contraseña</string>
     <string name="password_changed">Contraseña Actualizada</string>
-    <string name="write_down_your_email_if_the_email_is_registered_you_will_receive_a_security_code">Escribe tu correo. Si el correo está registrado, recibirás un código de seguridad.</string>
+    <string name="write_down_your_email_if_the_email_is_registered_you_will_receive_a_security_code">Introduce tu correo. Si está registrado, recibirás un código de seguridad.</string>
     <string name="send">Enviar</string>
     <string name="security_code">Código de seguridad</string>
     <string name="enter_your_new_password">Introduce la nueva contraseña.</string>
@@ -65,4 +65,9 @@
     <string name="expired_code">CÓDIGO EXPIRADO</string>
     <string name="forgot_password">¿Contraseña olvidada?</string>
     <string name="invalid_code">CÓDIGO INVÁLIDO</string>
+    <string name="next">Siguiente</string>
+    <string name="send_security_code_to_email">Enviar Código de Seguridad</string>
+    <string name="verify_security_code">Validar Código de Seguridad</string>
+    <string name="change_password">Cambiar Contraseña</string>
+    <string name="already_have_an_account">¿Ya tienes una cuenta?</string>
 </resources>

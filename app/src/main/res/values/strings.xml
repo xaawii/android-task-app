@@ -64,4 +64,9 @@
     <string name="expired_code">EXPIRED CODE</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="invalid_code">INVALID CODE</string>
+    <string name="next">Next</string>
+    <string name="send_security_code_to_email">Send Security Code</string>
+    <string name="verify_security_code">Validate Security Code</string>
+    <string name="change_password">Change Password</string>
+    <string name="already_have_an_account">Already have an account?</string>
 </resources>

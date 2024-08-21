@@ -52,7 +52,7 @@ fun PasswordTextField(
             ),
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label) },
+            label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

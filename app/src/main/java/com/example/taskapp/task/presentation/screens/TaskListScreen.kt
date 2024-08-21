@@ -198,7 +198,7 @@ private fun MainBody(
                     nextMonth = { taskListViewModel.changeMonth(true) }
                 )
 
-                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 //task list
                 if (uiState.tasks.isEmpty()) {
                     NoTaskText()

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -29,7 +30,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.example.taskapp.R
-import com.example.taskapp.core.presentation.components.CircleBackground
 import com.example.taskapp.core.presentation.components.ErrorComponent
 import com.example.taskapp.core.presentation.components.LoadingComponent
 import com.example.taskapp.core.presentation.components.MyDatePicker
@@ -94,11 +94,17 @@ fun AddTaskScreen(
         }
 
         AddTaskUIState.Created -> {
-            SuccessComponent(text = stringResource(R.string.task_created), onFinish = navigationController::popBackStack)
+            SuccessComponent(
+                text = stringResource(R.string.task_created),
+                onFinish = navigationController::popBackStack
+            )
         }
 
         AddTaskUIState.Updated -> {
-            SuccessComponent(text = stringResource(R.string.task_updated), onFinish = navigationController::popBackStack)
+            SuccessComponent(
+                text = stringResource(R.string.task_updated),
+                onFinish = navigationController::popBackStack
+            )
         }
     }
 }
@@ -114,16 +120,17 @@ private fun MainBody(
     val title =
         if (uiState.mode != "update") stringResource(R.string.create_task) else stringResource(R.string.update_task)
 
-    CircleBackground(color = MaterialTheme.colorScheme.primary) {
-        Scaffold(containerColor = Color.Transparent, topBar = {
-            TopAppBarBack(
-                title = title, onBackPressed = navigationController::popBackStack
-            )
-        }) { contentPadding ->
 
-            FormBody(contentPadding, uiState, addTaskViewModel)
+    Scaffold(containerColor = Color.Transparent, topBar = {
+        TopAppBarBack(
+            title = title,
+            titleStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            onBackPressed = navigationController::popBackStack
+        )
+    }) { contentPadding ->
 
-        }
+        FormBody(contentPadding, uiState, addTaskViewModel)
+
     }
 
 
@@ -138,10 +145,9 @@ private fun FormBody(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         //title
@@ -182,20 +188,32 @@ private fun FormBody(
         ) { addTaskViewModel.onDueTimeChanged(LocalTime.of(it.hour, it.minute)) }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = addTaskViewModel::onButtonPressed,
-            enabled = uiState.formIsValid
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .weight(1F),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
         ) {
-            val text = if (uiState.mode == "update") {
-                stringResource(R.string.update)
-            } else stringResource(
-                R.string.create
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium
-            )
+
+            Button(
+                onClick = addTaskViewModel::onButtonPressed,
+                enabled = uiState.formIsValid
+            ) {
+                val text = if (uiState.mode == "update") {
+                    stringResource(R.string.update)
+                } else stringResource(
+                    R.string.create
+                )
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
+
+
     }
 }
 
